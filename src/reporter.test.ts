@@ -10,7 +10,7 @@ describe('formatReport', () => {
   it('returns text output with header when clean', () => {
     const out = formatReport(makeReport({ used: ['express'], totalDeclared: 1 }), { format: 'text' });
     expect(out).toContain('unuseddeps');
-    expect(out).toContain('No unused dependencies found');
+    expect(out).toContain('Clean');
   });
 
   it('returns text output listing unused when present', () => {

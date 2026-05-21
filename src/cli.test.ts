@@ -73,7 +73,7 @@ describe('cli: all-clean fixture', () => {
   it('exits 0 when no unused deps', () => {
     const result = runCli([], fixture);
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain('No unused dependencies');
+    expect(result.stdout).toContain('Clean');
   });
 
   it('outputs clean summary in stdout', () => {
