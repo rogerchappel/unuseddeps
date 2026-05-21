@@ -1,100 +1,66 @@
-# Contributing
+# Contributing to unuseddeps
 
-Thanks for helping improve this project.
+Thanks for wanting to contribute! 🧭
 
-This repository is intended to stay reviewable, reusable, and safe for future maintainers. Contributions should be small enough to review, clear about their intent, and verified before they are submitted.
+## Quick start for contributors
 
-## Issues
-
-Use issues for bugs, feature requests, documentation improvements, and agent tasks.
-
-Before opening an issue:
-
-- Search existing issues to avoid duplicates.
-- Confirm whether the request applies to this template repository or to a repository generated from it.
-- Include enough context for another maintainer or agent to reproduce the problem or understand the requested change.
-
-For bug reports, include:
-
-- What happened.
-- What you expected to happen.
-- Steps to reproduce, when applicable.
-- Relevant logs, screenshots, links, or files.
-- The smallest verification command or manual check that demonstrates the problem.
-
-For feature requests, include:
-
-- The use case.
-- Why the current template is insufficient.
-- Any risks, compatibility concerns, or migration notes.
-- Suggested files or templates that may need to change.
-
-## Pull Requests
-
-Pull requests should be focused on one reviewable intent.
-
-Expected PR standards:
-
-- Use a branch for the change.
-- Keep unrelated formatting, dependency, generated file, and behavior changes separate.
-- Follow Conventional Commits for commit messages.
-- Update documentation or templates when behavior or workflow expectations change.
-- Do not include secrets, private credentials, private contact details, or client-specific information.
-- Do not imply paid support, guaranteed response times, or production SLAs unless the project explicitly provides them.
-
-## Review Packs
-
-Every meaningful PR should include a review pack in the PR body or final agent response.
-
-Use this format:
-
-```md
-## Review Pack
-Repo:
-Branch:
-PR:
-Task:
-Status: done / blocked / needs review
-Summary:
-Commits:
-Files changed:
-Verification:
-Risk level:
-Rollback plan:
-Human decision needed:
-Next recommended task:
+```bash
+git clone https://github.com/rogerchappel/unuseddeps.git
+cd unuseddeps
+npm install
+npm test        # run all tests
+npm run build   # compile TypeScript
+npm run check   # type check + lint
 ```
 
-Keep the review pack factual. It should say what changed, how it was verified, what remains risky, and what a reviewer should decide next.
+## Project structure
 
-## Verification
+```
+src/
+  parser.ts      — package.json parsing
+  scanner.ts     — import/require statement extraction
+  referencer.ts  — cross-reference engine (unused detection)
+  reporter.ts    — output formatting (text + JSON)
+  cli.ts         — commander CLI entry point
+  index.ts       — public API exports + detectUnused()
+fixtures/        — sample projects for testing
+```
 
-Every contribution needs verification appropriate to the change.
+## Before submitting a PR
 
-Use the smallest relevant verification first:
+1. ✅ Run `npm test` — all tests must pass
+2. ✅ Run `npm run check` — no type errors or lint failures
+3. ✅ Coverage stays above 85% (`npm run test:coverage`)
+4. ✅ Commit messages follow Conventional Commits format:
+   ```
+   feat(scanner): detect dynamic import() patterns
+   fix(referencer): handle @types/ aliases correctly
+   test: add fixture for monorepo workspaces
+   docs(readme): update CI integration examples
+   ```
 
-- Documentation-only changes: review the rendered Markdown or inspect the diff.
-- Template changes: confirm placeholders are clear and no project-specific private details were introduced.
-- CI or workflow changes: run the narrowest relevant local check, then confirm expected GitHub Actions behavior when possible.
-- Code changes in generated repositories: run the targeted test, typecheck, lint, build, or smoke command that proves the change.
+## Code style
 
-If verification cannot be run, say why and provide the exact command or manual check a maintainer should run.
+- 2-space indentation
+- Single quotes
+- Semicolons
+- ESM imports only (no `require()`)
+- TypeScript strict mode
 
-## Agent Contributions
+Format with `npm run format`.
 
-AI agent contributions must follow the same standards as human contributions.
+## How to contribute
 
-Agents should:
+1. Check existing [issues](../../issues) — someone might already be working on it
+2. Fork the repo, create a feature branch
+3. Write tests for new behavior
+4. Submit a PR with a clear description of what changed and why
 
-- State the objective, blast radius, files likely to change, verification plan, and risk level before editing.
-- Work in small, atomic commits.
-- Review `git status` and `git diff` before staging.
-- Stage only files related to the current intent.
-- Avoid touching risky areas such as auth, billing, production data, secrets, licensing, telemetry, or public API compatibility without explicit maintainer approval.
-- Return a review pack when done.
+## Questions?
 
-## Maintainer Review
+- File an [issue](../../issues) for bugs or feature requests
+- Read [ROADMAP.md](ROADMAP.md) for planned features
 
-Maintainers may ask for smaller commits, clearer verification, reduced scope, or safer defaults before merging.
+## License
 
-No contribution is accepted until a maintainer reviews and approves it.
+By contributing, you agree that your contributions will be licensed under the MIT license.
