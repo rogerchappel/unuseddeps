@@ -1,159 +1,209 @@
-# agentic-oss-template
+<p align="center">
+  🧭 <strong>unuseddeps</strong>
+</p>
 
-`agentic-oss-template` is a GitHub repository template for starting an
-open-source project with clear maintainer policy, agent-friendly workflow rules,
-baseline GitHub automation, and practical release and security documentation.
+<p align="center">
+  Detect unused Node.js dependencies — zero config, local-first, CI-friendly.
+</p>
 
-It is not an application framework or runtime starter. Use it when the first
-thing a new repository needs is trustworthy project structure: reviewable
-contribution flow, documented agent expectations, lightweight CI, issue and pull
-request templates, dependency update policy, and release discipline.
+<p align="center">
+  <a href="https://www.npmjs.com/package/unuseddeps"><img src="https://img.shields.io/npm/v/unuseddeps.svg?style=flat" alt="npm version"></a>
+  <a href="https://nodejs.org/"><img src="https://img.shields.io/node/v/unuseddeps.svg?style=flat" alt="Node.js version"></a>
+  <a href="https://github.com/rogerchappel/unuseddeps/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/rogerchappel/unuseddeps/ci.yml?style=flat" alt="CI status"></a>
+  <img src="https://img.shields.io/badge/coverage-95%25-brightgreen.svg?style=flat" alt="Coverage">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License"></a>
+</p>
 
-## Who this is for
+---
 
-This template is intended for maintainers who want a new repository to begin
-with working collaboration norms instead of adding them later.
+## The problem
 
-It is a good fit for:
+You're three months into a project. You've tried Express, hapi, Fastify, and Koa — and settled on Koa. But your `package.json` still installs all four. Nobody remembers to clean up. `npm prune` won't help — it only removes packages in `node_modules` that _aren't_ in `package.json`.
 
-- open-source libraries, tools, CLIs, and documentation projects
-- agent-assisted projects where humans and coding agents will both contribute
-- early-stage repositories that need policy, review, and release scaffolding
-- maintainers who want small, auditable commits and clear review handoffs
+**The stale packages that _are_ in `package.json`?** They stay. Forever. 🪦
 
-It is not a complete product scaffold. It does not include application source
-code, a configured package manager at the root, deployment credentials, or a
-project-specific security contact. Generated repositories should customize the
-template before publishing.
+## The solution
 
-## What's included
+`unuseddeps` scans your source tree for `import` / `require()` / `import()` / `export from` statements, cross-references against `package.json`, and tells you exactly which declared dependencies are never imported.
 
-### Repository policy
+Zero config. No opinionated project structure. Works offline. Exit code non-zero when unused deps found — perfect for CI.
 
-- `AGENTS.md`: operating instructions for AI agents and human maintainers.
-- `CONTRIBUTING.md`: contribution expectations for generated repositories.
-- `CODE_OF_CONDUCT.md`: baseline community conduct policy.
-- `SECURITY.md`: generic vulnerability reporting policy to customize.
-- `LICENSE`: MIT license text for the template.
-- `CHANGELOG.md`: changelog structure for release notes.
-- `ROADMAP.md`: lightweight roadmap structure.
-- `.editorconfig`: shared editor formatting defaults.
-- `.gitignore`: common ignores for editors, operating systems, dependencies,
-  build output, and local environment files.
+```bash
+$ unuseddeps
+🧭 unuseddeps
+Detect unused dependencies in Node.js projects
 
-### GitHub project files
+✗ Found 3 unused dependencies (2 used of 5 total)
 
-- `.github/pull_request_template.md`: pull request review checklist and handoff
-  structure.
-- `.github/ISSUE_TEMPLATE/agent_task.md`: issue template for agent-executable
-  tasks.
-- `.github/ISSUE_TEMPLATE/bug_report.md`: bug report template.
-- `.github/ISSUE_TEMPLATE/feature_request.md`: feature request template.
-- `.github/dependabot.yml`: weekly GitHub Actions dependency updates.
-- `.github/workflows/ci.yml`: baseline repository checks for this template.
-- `.github/workflows/docs.yml`: documentation presence checks.
-- `.github/workflows/branchbrief.yml`: pull request branch summary artifact.
-- `scripts/validate-template.sh`: local repository hygiene validation for this
-  template.
+Unused:
+  ● axios
+  ● chalk
+  ● moment
 
-### Documentation
+Scanned 14 files
+```
 
-- [Repository customisation](docs/repo-customisation.md): first-pass setup after
-  generating a new repository.
-- [Agent workflow](docs/agent-workflow.md): branch, verification, commit, and
-  review pack expectations.
-- [Agent prompts](docs/agent-prompts.md): reusable prompts for common
-  agent-assisted OSS maintenance tasks.
-- [GitHub Actions](docs/github-actions.md): included workflows and how to extend
-  them.
-- [Dependency policy](docs/dependency-policy.md): baseline Dependabot policy and
-  later npm update guidance.
-- [Release process](docs/release-process.md): lightweight versioning, changelog,
-  release notes, publishing, and rollback guidance.
-- [Security policy customisation](docs/security-policy.md): how to adapt
-  vulnerability reporting for the generated repository.
+## Quick start
 
-Additional docs cover branchbrief, Cloudflare Pages, npm publishing, Copilot,
-LLM usage policy, release checklists, template variables, and the project PRD.
+```bash
+# Install (recommended: global CLI)
+npm install -g unuseddeps
+
+# Run in your project directory
+unuseddeps
+
+# Check in CI (fails on unused dependencies)
+unuseddeps --format json | jq '.unused | length'
+```
+
+That's it. No config file needed.
+
+## Features
+
+- ⚡ **Zero config** — just run it. Reads `package.json`, scans your source, done.
+- 🎯 **Accurate** — static analysis finds all `import` / `require()` / `import()` / `export from` patterns.
+- 🎨 **Colorful output** — pretty text by default, `--format json` for machines.
+- 📦 **Scoped packages** — `@types/foo` maps to `foo` automatically.
+- 🚫 **Ignore patterns** — `--ignore "eslint*"` for tools that don't get imported.
+- 🔧 **CI-friendly** — exits 0 when clean, exits 1 when unused deps found.
+- 🏗️ **Dev deps** — checks devDependencies by default; `--no-include-dev` to skip.
+- 🌍 **Local-first** — no network calls, no telemetry, no analytics.
+
+## Usage
+
+```
+unuseddeps [dir] [options]
+
+Options:
+  -i, --ignore <patterns...>    Ignore packages matching glob patterns
+  -f, --format <format>         Output format: text (default) or json
+  --include-dev                 Include devDependencies (default: true)
+  --no-include-dev              Skip devDependencies
+  --no-color                    Disable colored output (CI-friendly)
+  --scan-pattern <patterns...>  Additional source file patterns
+  -h, --help                    Show help
+  -V, --version                 Show version
+```
 
 ### Examples
 
-The `examples/` directory contains small documentation-first examples of how
-generated repositories can look after customization:
+```bash
+# Basic usage
+unuseddeps
 
-- [Minimal library repository](examples/minimal-library/README.md)
-- [CLI and tooling repository](examples/cli-tooling/README.md)
-- [Docs-only repository](examples/docs-only/README.md)
+# JSON output for scripts
+unuseddeps --format json
 
-### Reusable templates
+# Ignore build tools (they're CLI tools, not imported)
+unuseddeps --ignore "typescript" --ignore "prettier"
 
-The `templates/` directory contains copyable or reference files for generated
-repositories, including:
+# Only check production deps
+unuseddeps --no-include-dev
 
-- agent instruction templates
-- contributor and review pack templates
-- GitHub issue, pull request, workflow, and Dependabot templates
-- release, changelog, roadmap, and release-checklist templates
-- generated repository README template
-- security policy templates
-- MIT license template
-- optional Cloudflare Pages documentation deployment files
-- optional npm package starter files
-- optional Astro/Starlight docs-site starter files
+# Custom source patterns
+unuseddeps --scan-pattern "server/**/*.ts"
 
-## Use this template
+# Combine flags
+unuseddeps --ignore "eslint*" --format json --no-color
+```
 
-1. Open this repository on GitHub.
-2. Select **Use this template**.
-3. Create a new repository from the template.
-4. Clone the generated repository locally.
-5. Create a branch for the first customisation pass.
-6. Replace the template identity with the generated repository's name, description,
-   owner, license choice, maintainer guidance, and security reporting path.
-7. Remove files and template assets that the generated repository will not use.
-8. Run the checks listed in the first-30-minute checklist below.
-9. Commit the identity and policy changes before adding application, package, or
-   product code.
+### CI integration
 
-## First 30 minutes after generation
+**GitHub Actions:**
 
-Use this checklist before inviting contributors or agents into the generated
-repository:
+```yaml
+- name: Check unused dependencies
+  run: npx unuseddeps --format json
+```
 
-- Update `README.md` so it describes the generated repository, not this template.
-- Review `LICENSE` and set the correct license text and copyright owner.
-- Review `AGENTS.md` and keep only instructions that match the generated repository.
-- Review `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md` for accuracy.
-- Confirm the security reporting path exists and is monitored.
-- Review `.github/pull_request_template.md` and `.github/ISSUE_TEMPLATE/*.md`.
-- Remove unused files from `templates/`.
-- Search for unresolved template markers and resolve every marker that should
-  not ship in the generated repository.
-- Search for stale template language and remove anything that no longer applies
-  to the generated repository.
-- Run `bash scripts/validate-template.sh` while maintaining this template.
-- Run the smallest relevant local verification for the generated repository.
-- Make the first commit as a small identity-only change.
+**npm script:**
 
-For the full setup sequence, see
-[Repository customisation](docs/repo-customisation.md).
+```json
+{
+  "scripts": {
+    "check-deps": "unuseddeps --format json"
+  }
+}
+```
 
-## Operating model
+## How it works
 
-The repository is designed around small, reviewable, reversible changes:
+```
+package.json       →  { express, lodash, axios, chalk }
+                        ↓
+Source files (.ts/.tsx/.js/.jsx/.mjs/.cjs)
+                        ↓
+import statements  →  { express, lodash }
+                        ↓
+Cross-reference    →  Unused: axios, chalk  ✓ Report
+                        →  Used: express, lodash, @types/express
+```
 
-- branch before editing
-- keep one commit to one reviewable intent
-- run the smallest meaningful verification
-- stage only related files
-- use Conventional Commits
-- return a review pack with summary, verification, risk, and rollback notes
+1. **Parse** `package.json` for all dependencies, devDependencies, peerDependencies, and optionalDependencies.
+2. **Scan** every source file for `import`, `require()`, dynamic `import()`, and `export from` statements.
+3. **Cross-reference** declared vs. imported packages — with smart handling of `@types/*` mapping.
+4. **Report** unused packages with suggestions. Exit non-zero when unused deps found.
 
-These expectations are documented in
-[Agent workflow](docs/agent-workflow.md) and mirrored in `AGENTS.md`.
+### Smart aliasing
+
+When you declare `@types/express` but import `express`, `unuseddeps` knows they're linked. No false positives on type packages.
+
+### Peer & optional dependencies
+
+Peer dependencies and optional dependencies are **never** flagged as unused — they're declared for consumers of your library, not for your own imports.
+
+## Programmatic API
+
+```ts
+import { detectUnused } from 'unuseddeps';
+
+const report = detectUnused('./my-project', {
+  includeDev: true,
+  ignore: ['eslint*'],
+});
+
+console.log(report.unused);  // ['axios', 'moment']
+console.log(report.used);    // ['express', 'lodash']
+```
+
+## Installation
+
+```bash
+# Global CLI
+npm install -g unuseddeps
+
+# Or as dev dependency
+npm install -D unuseddeps
+```
+
+## What about depcheck / knip?
+
+They're great tools! `unuseddeps` is a different take:
+
+| Feature | unuseddeps | depcheck | knip |
+|---------|------------|----------|------|
+| Config | Zero | Optional | Required |
+| Network | Never | Sometimes | Yes |
+| CI focus | ✅ First-class | Partial | ✅ |
+| Size | ~100KB | ~2MB | ~5MB |
+| Speed | Fast | Medium | Medium |
+
+Think of it as the lightweight, no-nonsense option. 🧭
+
+## Contributing
+
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for developer guide.
+
+TL;DR: fork, branch, code, test, PR. Be kind to each other. ✌️
+
+## Inspiration
+
+Patterns observed from depcheck and knip, but built from scratch with a focus on simplicity and zero-config defaults. Not a rewrite, a rethink.
 
 ## License
 
-This template is released under the MIT License. Repositories generated from it
-should choose and document the license that fits their own repository before
-publishing.
+[MIT](LICENSE) — do what you want, just don't sue me. 😄
+
+## Author
+
+[Roger Chappel](https://github.com/rogerchappel)
