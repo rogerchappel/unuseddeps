@@ -1,0 +1,63 @@
+{
+  "name": "unuseddeps",
+  "version": "0.1.0",
+  "description": "Detect unused Node.js dependencies — zero config, local-first, CI-friendly",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "unuseddeps": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/",
+    "format": "prettier --write src/",
+    "check": "tsc --noEmit && npm run lint",
+    "smoke": "tsx src/cli.ts fixtures/all-clean",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rogerchappel/unuseddeps.git"
+  },
+  "homepage": "https://github.com/rogerchappel/unuseddeps#readme",
+  "bugs": {
+    "url": "https://github.com/rogerchappel/unuseddeps/issues"
+  },
+  "keywords": [
+    "dependencies",
+    "unused",
+    "nodejs",
+    "typescript",
+    "cli",
+    "ci",
+    "package.json",
+    "cleanup",
+    "audit"
+  ],
+  "author": "Roger Chappel",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "glob": "^10.4.0",
+    "picocolors": "^1.1.0",
+    "yaml": "^2.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@vitest/coverage-v8": "^2.0.0",
+    "eslint": "^9.6.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.59.4",
+    "vitest": "^2.0.0"
+  }
+}
