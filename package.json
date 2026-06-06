@@ -7,6 +7,13 @@
   "bin": {
     "unuseddeps": "dist/cli.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/cli.ts",
@@ -17,6 +24,8 @@
     "format": "prettier --write src/",
     "check": "tsc --noEmit && npm run lint",
     "smoke": "tsx src/cli.ts fixtures/all-clean",
+    "package:smoke": "npm pack --dry-run",
+    "release:check": "npm run check && npm test && npm run build && npm run smoke && npm run package:smoke",
     "prepublishOnly": "npm run build"
   },
   "repository": {
