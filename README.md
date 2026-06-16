@@ -10,7 +10,6 @@
   <a href="https://www.npmjs.com/package/unuseddeps"><img src="https://img.shields.io/npm/v/unuseddeps.svg?style=flat" alt="npm version"></a>
   <a href="https://nodejs.org/"><img src="https://img.shields.io/node/v/unuseddeps.svg?style=flat" alt="Node.js version"></a>
   <a href="https://github.com/rogerchappel/unuseddeps/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/rogerchappel/unuseddeps/ci.yml?style=flat" alt="CI status"></a>
-  <img src="https://img.shields.io/badge/coverage-95%25-brightgreen.svg?style=flat" alt="Coverage">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License"></a>
 </p>
 
@@ -178,17 +177,29 @@ npm install -D unuseddeps
 
 ## What about depcheck / knip?
 
-They're great tools! `unuseddeps` is a different take:
+They're useful tools with broader ecosystems. `unuseddeps` keeps a narrower release surface:
 
 | Feature | unuseddeps | depcheck | knip |
 |---------|------------|----------|------|
-| Config | Zero | Optional | Required |
-| Network | Never | Sometimes | Yes |
-| CI focus | ✅ First-class | Partial | ✅ |
-| Size | ~100KB | ~2MB | ~5MB |
-| Speed | Fast | Medium | Medium |
+| Primary goal | Small dependency scan | General dependency analysis | Workspace dependency analysis |
+| Default setup | No config file | Optional config | Config often useful |
+| Local-first mode | Yes | Tool-dependent | Tool-dependent |
+| CI behavior | Non-zero on unused deps | Supported | Supported |
 
-Think of it as the lightweight, no-nonsense option. 🧭
+Choose `unuseddeps` when you want a focused local scan with a small, explicit CLI surface.
+
+## Release verification
+
+```bash
+npm run check
+npm test
+npm run build
+npm run smoke
+npm run package:smoke
+npm run release:check
+```
+
+`npm run package:smoke` verifies the published package allowlist. The package ships compiled `dist` output plus the README, license, security policy, and changelog; fixtures and test coverage reports stay out of the npm artifact.
 
 ## Contributing
 
