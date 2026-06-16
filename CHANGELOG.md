@@ -9,31 +9,19 @@ format and uses semantic versioning when versioned releases are published.
 
 ### Added
 
-- Initial release planning, roadmap, and release-process documentation.
-- Template validation script and documentation for local repository hygiene
-  checks.
-- Example generated repository shapes for minimal libraries, CLI tooling, and
-  docs-only projects.
-- Optional generated repository README template.
-- Reusable agent prompt library for common OSS maintenance tasks.
+- CLI for scanning JavaScript and TypeScript projects for declared dependencies that are not imported by source files.
+- JSON and text output modes for local use and CI pipelines.
+- Fixture-backed tests covering clean projects, scoped packages, dev-only dependencies, and unused dependency reports.
+- Release-candidate package checks with `npm run package:smoke` and `npm run release:check`.
 
 ### Changed
 
-- Aligned template terminology, placeholder documentation, and current V1
-  surface area across docs, templates, and workflows.
-- Expanded the optional docs-site template with clearer setup guidance and a
-  contributing starter page.
-- Expanded template inventory checks and directory documentation to include the
-  generated repository README template.
-- Tightened template file validation and aligned generated workflow action
-  versions.
+- Replaced template changelog content with release notes specific to `unuseddeps`.
+- Clarified README comparison language to avoid unverifiable benchmark and package-size claims.
 
 ## Release Links
 
 - Unreleased:
-  `https://github.com/OWNER/REPOSITORY/compare/vLAST...HEAD`
+  `https://github.com/rogerchappel/unuseddeps/compare/v0.1.0...HEAD`
 - Latest release:
-  `https://github.com/OWNER/REPOSITORY/releases/latest`
-
-Replace `OWNER`, `REPOSITORY`, and `vLAST` after generating a project from this
-template.
+  `https://github.com/rogerchappel/unuseddeps/releases/latest`
