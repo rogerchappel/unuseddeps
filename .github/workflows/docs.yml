@@ -45,12 +45,5 @@ jobs:
             test -s "$file"
           done < markdown-files.txt
 
-      - name: Print docs customization TODO
-        run: |
-          set -euo pipefail
-
-          if [ -f package.json ]; then
-            echo "Add docs build verification here when the repository has a docs toolchain."
-          else
-            echo "No package.json found; docs workflow is limited to markdown hygiene."
-          fi
+      - name: Validate release templates
+        run: bash scripts/validate-template.sh
