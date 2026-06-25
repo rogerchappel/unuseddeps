@@ -199,7 +199,10 @@ npm run package:smoke
 npm run release:check
 ```
 
-`npm run package:smoke` verifies the published package allowlist. The package ships compiled `dist` output plus the README, license, security policy, and changelog; fixtures and test coverage reports stay out of the npm artifact.
+`npm run package:smoke` builds the CLI, runs `npm pack --dry-run`, and asserts
+the published package allowlist. The package ships compiled `dist` output plus
+the README, license, security policy, and changelog; source fixtures and test
+coverage reports stay out of the npm artifact.
 
 ## Contributing
 
