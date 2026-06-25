@@ -24,7 +24,7 @@
     "format": "prettier --write src/",
     "check": "tsc --noEmit && npm run lint",
     "smoke": "tsx src/cli.ts fixtures/all-clean",
-    "package:smoke": "npm pack --dry-run",
+    "package:smoke": "npm run build && node scripts/package-smoke.mjs",
     "release:check": "npm run check && npm test && npm run build && npm run smoke && npm run package:smoke",
     "prepublishOnly": "npm run build"
   },
