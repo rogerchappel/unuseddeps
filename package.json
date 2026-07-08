@@ -15,7 +15,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && chmod +x dist/cli.js",
     "dev": "tsx src/cli.ts",
     "test": "vitest run",
     "test:watch": "vitest",
