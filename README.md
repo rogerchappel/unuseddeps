@@ -215,6 +215,13 @@ TL;DR: fork, branch, code, test, PR. Be kind to each other. ✌️
 
 Patterns observed from depcheck and knip, but built from scratch with a focus on simplicity and zero-config defaults. Not a rewrite, a rethink.
 
+## Limitations and Safety
+
+- Detect unused Node.js dependencies — zero config, local-first, CI-friendly; it is intended for local, reviewable developer workflows rather than unattended production automation.
+- Review generated output before using it in commits, releases, issue updates, or connector actions.
+- Avoid passing secrets, private customer data, or unredacted logs through fixtures, examples, or command output.
+- Treat warnings and non-zero exits from `unuseddeps` as review signals, then rerun the documented verification command after changes.
+
 ## License
 
 [MIT](LICENSE) — do what you want, just don't sue me. 😄
