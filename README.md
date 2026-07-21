@@ -57,6 +57,20 @@ unuseddeps --format json | jq '.unused | length'
 
 That's it. No config file needed.
 
+## Runnable demo
+
+Run a deterministic comparison using only the checked-in fixtures:
+
+```bash
+npm install
+npm run demo
+```
+
+The demo builds the CLI, proves that `fixtures/unused-three` reports `axios`,
+`chalk`, and `moment` with exit code `1`, then proves that `fixtures/all-clean`
+has no unused dependencies and exits `0`. It does not install fixture packages
+or make network calls after the initial project install.
+
 ## Features
 
 - ⚡ **Zero config** — just run it. Reads `package.json`, scans your source, done.
