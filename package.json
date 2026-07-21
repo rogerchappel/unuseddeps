@@ -23,6 +23,7 @@
     "lint": "eslint src/",
     "format": "prettier --write src/",
     "check": "tsc --noEmit && npm run lint",
+    "demo": "bash demo/run-fixture-scan.sh",
     "smoke": "tsx src/cli.ts fixtures/all-clean",
     "package:smoke": "npm run build && node scripts/package-smoke.mjs",
     "release:check": "npm run check && npm test && npm run build && npm run smoke && npm run package:smoke",
