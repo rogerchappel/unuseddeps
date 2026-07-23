@@ -82,6 +82,20 @@ describe('cli: all-clean fixture', () => {
   });
 });
 
+describe('cli: ignored-directories fixture', () => {
+  const fixture = resolve(__dirname, '..', 'fixtures', 'ignored-directories');
+
+  it('does not count imports in excluded directory descendants', () => {
+    const result = runCli(['--format', 'json'], fixture);
+    const report = JSON.parse(result.stderr || result.stdout);
+
+    expect(result.code).toBe(1);
+    expect(report.unused).toEqual(['chalk', 'left-pad']);
+    expect(report.used).toEqual([]);
+    expect(report.scannedFiles).toBe(1);
+  });
+});
+
 describe('cli: error cases', () => {
   it('exits 2 for unknown format', () => {
     const fixture = resolve(__dirname, '..', 'fixtures', 'all-clean');
