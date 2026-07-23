@@ -39,48 +39,141 @@ function topLevelPackage(specifier: string): string | null {
   return specifier.split("/")[0] || null;
 }
 
+interface SourceToken {
+  kind: "identifier" | "string" | "punctuation";
+  value: string;
+}
+
+/**
+ * Tokenize only the source elements needed to recognize module references.
+ * Comments and template literals are deliberately discarded so text inside
+ * them cannot look like executable import syntax.
+ */
+function tokenizeSource(content: string): SourceToken[] {
+  const tokens: SourceToken[] = [];
+  let index = 0;
+
+  while (index < content.length) {
+    const character = content[index];
+
+    if (/\s/.test(character)) {
+      index += 1;
+      continue;
+    }
+
+    if (character === "/" && content[index + 1] === "/") {
+      index += 2;
+      while (index < content.length && content[index] !== "\n") index += 1;
+      continue;
+    }
+
+    if (character === "/" && content[index + 1] === "*") {
+      index += 2;
+      while (
+        index < content.length &&
+        !(content[index] === "*" && content[index + 1] === "/")
+      ) {
+        index += 1;
+      }
+      index += 2;
+      continue;
+    }
+
+    if (character === "`") {
+      index += 1;
+      while (index < content.length) {
+        if (content[index] === "\\") {
+          index += 2;
+        } else if (content[index] === "`") {
+          index += 1;
+          break;
+        } else {
+          index += 1;
+        }
+      }
+      continue;
+    }
+
+    if (character === "'" || character === '"') {
+      const quote = character;
+      let value = "";
+      index += 1;
+      while (index < content.length && content[index] !== quote) {
+        if (content[index] === "\\" && index + 1 < content.length) {
+          value += content[index] + content[index + 1];
+          index += 2;
+        } else {
+          value += content[index];
+          index += 1;
+        }
+      }
+      if (content[index] === quote) index += 1;
+      tokens.push({ kind: "string", value });
+      continue;
+    }
+
+    if (/[A-Za-z_$]/.test(character)) {
+      const start = index;
+      index += 1;
+      while (index < content.length && /[A-Za-z0-9_$]/.test(content[index])) {
+        index += 1;
+      }
+      tokens.push({ kind: "identifier", value: content.slice(start, index) });
+      continue;
+    }
+
+    tokens.push({ kind: "punctuation", value: character });
+    index += 1;
+  }
+
+  return tokens;
+}
+
+function addPackage(results: Set<string>, token: SourceToken | undefined): void {
+  if (token?.kind !== "string") return;
+  const top = topLevelPackage(token.value);
+  if (top) results.add(top);
+}
+
 /**
  * Scan a single file string and return unique top-level package names.
  */
 export function scanFileSource(content: string): Set<string> {
   const results = new Set<string>();
+  const tokens = tokenizeSource(content);
 
-  // Pattern 1: import ... from 'pkg'
-  for (const m of content.matchAll(
-    /import\s+(?:type\s+)?[\s\S]*?\s+from\s+['"](.*?)['"]/g,
-  )) {
-    const top = topLevelPackage(m[1]);
-    if (top) results.add(top);
-  }
+  for (let index = 0; index < tokens.length; index += 1) {
+    const token = tokens[index];
 
-  // Pattern 2: side-effect imports: import 'pkg'
-  for (const m of content.matchAll(/^import\s+['"](.*?)['"];?\s*$/gm)) {
-    const top = topLevelPackage(m[1]);
-    if (top) results.add(top);
-  }
+    if (
+      token.value === "require" &&
+      tokens[index - 1]?.value !== "." &&
+      tokens[index + 1]?.value === "(" &&
+      tokens[index + 3]?.value === ")"
+    ) {
+      addPackage(results, tokens[index + 2]);
+      continue;
+    }
 
-  // Pattern 3: require('pkg')  /  require("pkg")
-  for (const m of content.matchAll(
-    /(?:^|[\s(])require\s*\(\s*['"](.*?)['"]\s*\)/gm,
-  )) {
-    const top = topLevelPackage(m[1]);
-    if (top) results.add(top);
-  }
+    if (token.value !== "import" && token.value !== "export") continue;
 
-  // Pattern 4: dynamic import: import('pkg')
-  for (const m of content.matchAll(
-    /import\s*\(\s*['"](.*?)['"]\s*\)/gm,
-  )) {
-    const top = topLevelPackage(m[1]);
-    if (top) results.add(top);
-  }
+    if (token.value === "import" && tokens[index + 1]?.value === "(") {
+      if (tokens[index + 3]?.value === ")") addPackage(results, tokens[index + 2]);
+      continue;
+    }
 
-  // Pattern 5: export ... from 'pkg'
-  for (const m of content.matchAll(
-    /export\s+[\s\S]*?\s+from\s+['"](.*?)['"]/g,
-  )) {
-    const top = topLevelPackage(m[1]);
-    if (top) results.add(top);
+    if (token.value === "import" && tokens[index + 1]?.kind === "string") {
+      addPackage(results, tokens[index + 1]);
+      continue;
+    }
+
+    for (let lookahead = index + 1; lookahead < tokens.length; lookahead += 1) {
+      if (tokens[lookahead].value === ";") break;
+      if (tokens[lookahead].value === "from") {
+        addPackage(results, tokens[lookahead + 1]);
+        break;
+      }
+    }
   }
 
   return results;
