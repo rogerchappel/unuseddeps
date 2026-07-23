@@ -12,6 +12,7 @@ import { parseManifest } from './parser.js';
 import { scanFiles, FILE_EXTENSIONS } from './scanner.js';
 import { findUnused, type UnusedReport } from './referencer.js';
 import { formatReport, exitCode } from './reporter.js';
+import { DEFAULT_EXCLUDE_PATTERNS } from './defaults.js';
 
 export { parseManifest, getNonFlagSet, getAllDeclared } from './parser.js';
 export { scanFileSource, scanFiles, FILE_EXTENSIONS } from './scanner.js';
@@ -49,7 +50,7 @@ export function detectUnused(dir: string, options: DetectOptions = {}): UnusedRe
     cwd: dir,
     nodir: true,
     absolute: true,
-    ignore: ['node_modules', 'dist', 'build', 'coverage', ...exclude],
+    ignore: [...DEFAULT_EXCLUDE_PATTERNS, ...exclude],
     dot: false,
   });
 
