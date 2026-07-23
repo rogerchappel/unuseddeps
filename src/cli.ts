@@ -18,14 +18,13 @@ import { parseManifest, getAllDeclared } from "./parser.js";
 import { scanFiles, FILE_EXTENSIONS } from "./scanner.js";
 import { findUnused } from "./referencer.js";
 import { formatReport, exitCode, type ReporterOptions } from "./reporter.js";
+import { DEFAULT_EXCLUDE_PATTERNS } from "./defaults.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const VERSION = (
   JSON.parse(readFileSync(join(__dirname, "..", "package.json"), "utf-8")) as { version: string }
 ).version;
-
-const IGNORE_DEFAULT = ["node_modules", "dist", "build", "coverage", "**/*.d.ts", "**/vite.config.*", "**/vitest.config.*"];
 
 const program = new Command();
 
@@ -88,7 +87,7 @@ if (allDeclared.size === 0) {
 // Collect files to scan
 const extGlobs = [...FILE_EXTENSIONS].map((ext) => `**/*${ext}`);
 const scanPatterns = opts.scanPattern ? [...extGlobs, ...opts.scanPattern] : extGlobs;
-const excludePatterns = IGNORE_DEFAULT;
+const excludePatterns = DEFAULT_EXCLUDE_PATTERNS;
 
 let scannedFiles: string[];
 try {
