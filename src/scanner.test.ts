@@ -70,6 +70,43 @@ describe('scanFileSource', () => {
     const result = scanFileSource(source);
     expect(result).toEqual(new Set(['express', 'lodash', 'axios', 'bar']));
   });
+
+  it('ignores imports in line comments', () => {
+    const source = `
+      // import fake from 'lodash';
+      import real from 'express';
+    `;
+
+    expect(scanFileSource(source)).toEqual(new Set(['express']));
+  });
+
+  it('ignores require calls in block comments', () => {
+    const source = `
+      /* require('chalk') */
+      const real = require('picocolors');
+    `;
+
+    expect(scanFileSource(source)).toEqual(new Set(['picocolors']));
+  });
+
+  it('ignores import and export syntax in quoted strings', () => {
+    const source = `
+      const importExample = "import fake from 'axios'";
+      const exportExample = "export * from 'moment'";
+      export { real } from 'yaml';
+    `;
+
+    expect(scanFileSource(source)).toEqual(new Set(['yaml']));
+  });
+
+  it('ignores module syntax in template literals', () => {
+    const source = `
+      const example = \`import('ora'); require('kleur')\`;
+      const real = import('glob');
+    `;
+
+    expect(scanFileSource(source)).toEqual(new Set(['glob']));
+  });
 });
 
 describe('FILE_EXTENSIONS', () => {
