@@ -153,7 +153,7 @@ Cross-reference    →  Unused: axios, chalk  ✓ Report
 ```
 
 1. **Parse** `package.json` for all dependencies, devDependencies, peerDependencies, and optionalDependencies.
-2. **Scan** every source file for `import`, `require()`, dynamic `import()`, and `export from` statements.
+2. **Scan** every source file for `import`, `require()`, dynamic `import()`, and `export from` statements. Generated and vendor directories (`node_modules`, `dist`, `build`, and `coverage`) are excluded by default.
 3. **Cross-reference** declared vs. imported packages — with smart handling of `@types/*` mapping.
 4. **Report** unused packages with suggestions. Exit non-zero when unused deps found.
 
