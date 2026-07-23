@@ -19,6 +19,10 @@ format and uses semantic versioning when versioned releases are published.
 - Replaced template changelog content with release notes specific to `unuseddeps`.
 - Clarified README comparison language to avoid unverifiable benchmark and package-size claims.
 
+### Fixed
+
+- Ignore import-like text inside comments and string or template literals when scanning dependencies.
+
 ## Release Links
 
 - Unreleased:
