@@ -96,6 +96,23 @@ describe('cli: ignored-directories fixture', () => {
   });
 });
 
+describe('cli: local protocol dependencies', () => {
+  const fixture = resolve(__dirname, '..', 'fixtures', 'local-protocols');
+
+  it('ignores local package names without hiding unrelated dependencies', () => {
+    const result = runCli(['--format', 'json'], fixture);
+    const report = JSON.parse(result.stderr || result.stdout);
+
+    expect(result.code).toBe(1);
+    expect(report.unused).toEqual(['lodash', 'vitest']);
+    expect(report.ignored).toEqual([
+      'local-file',
+      'local-link',
+      'local-workspace',
+    ]);
+  });
+});
+
 describe('cli: error cases', () => {
   it('exits 2 for unknown format', () => {
     const fixture = resolve(__dirname, '..', 'fixtures', 'all-clean');
