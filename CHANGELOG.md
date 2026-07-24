@@ -22,6 +22,7 @@ format and uses semantic versioning when versioned releases are published.
 ### Fixed
 
 - Ignore import-like text inside comments and string or template literals when scanning dependencies.
+- Match `workspace:`, `file:`, and `link:` dependencies by package name so protocol ranges cannot hide unrelated unused dependencies.
 
 ## Release Links
 
