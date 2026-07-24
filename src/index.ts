@@ -10,13 +10,21 @@ import { join } from 'node:path';
 import { glob } from 'glob';
 import { parseManifest } from './parser.js';
 import { scanFiles, FILE_EXTENSIONS } from './scanner.js';
-import { findUnused, type UnusedReport } from './referencer.js';
+import {
+  findUnused,
+  getLocalPackageNames,
+  type UnusedReport,
+} from './referencer.js';
 import { formatReport, exitCode } from './reporter.js';
 import { DEFAULT_EXCLUDE_PATTERNS } from './defaults.js';
 
 export { parseManifest, getNonFlagSet, getAllDeclared } from './parser.js';
 export { scanFileSource, scanFiles, FILE_EXTENSIONS } from './scanner.js';
-export { findUnused, normalizePackageName } from './referencer.js';
+export {
+  findUnused,
+  getLocalPackageNames,
+  normalizePackageName,
+} from './referencer.js';
 export { formatReport, exitCode } from './reporter.js';
 
 // Re-export convenience wrapper
@@ -59,12 +67,7 @@ export function detectUnused(dir: string, options: DetectOptions = {}): UnusedRe
   const report = findUnused(manifest, imports, {
     includeDev,
     ignore,
-    workspacePackages: [
-      ...Object.values(manifest.deps),
-      ...Object.values(manifest.devDeps),
-    ]
-      .filter((v: string) => v.startsWith('file:') || v.startsWith('link:') || v.startsWith('workspace:'))
-      .map((v: string) => v.replace(/^(file:|link:|workspace:)/, '')),
+    workspacePackages: getLocalPackageNames(manifest),
   });
 
   report.scannedFiles = files.length;

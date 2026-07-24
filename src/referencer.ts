@@ -5,6 +5,8 @@
 
 import type { ParsedManifest } from "./parser.js";
 
+const LOCAL_PROTOCOLS = ["file:", "link:", "workspace:"];
+
 export interface UnusedReport {
   /** Packages declared but never imported */
   unused: string[];
@@ -25,6 +27,17 @@ export function normalizePackageName(name: string): string {
   return name.startsWith("@types/") && name !== "@types"
     ? name.replace("@types/", "")
     : name;
+}
+
+/**
+ * Return dependency names whose ranges point to local packages.
+ */
+export function getLocalPackageNames(manifest: ParsedManifest): string[] {
+  return Object.entries({ ...manifest.deps, ...manifest.devDeps })
+    .filter(([, range]) =>
+      LOCAL_PROTOCOLS.some((protocol) => range.startsWith(protocol)),
+    )
+    .map(([name]) => name);
 }
 
 /**

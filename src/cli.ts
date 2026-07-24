@@ -16,7 +16,7 @@ import { fileURLToPath } from "node:url";
 
 import { parseManifest, getAllDeclared } from "./parser.js";
 import { scanFiles, FILE_EXTENSIONS } from "./scanner.js";
-import { findUnused } from "./referencer.js";
+import { findUnused, getLocalPackageNames } from "./referencer.js";
 import { formatReport, exitCode, type ReporterOptions } from "./reporter.js";
 import { DEFAULT_EXCLUDE_PATTERNS } from "./defaults.js";
 
@@ -114,9 +114,7 @@ const { imports } = scanFiles(scannedFiles);
 const report = findUnused(manifest, imports, {
   includeDev: opts.includeDev !== false,
   ignore: opts.ignore || [],
-  workspacePackages: [...Object.values(manifest.deps), ...Object.values(manifest.devDeps)]
-    .filter((v: string) => v.startsWith("file:") || v.startsWith("link:") || v.startsWith("workspace:"))
-    .map((v: string) => v.replace(/^(file:|link:|workspace:)/, "")),
+  workspacePackages: getLocalPackageNames(manifest),
 });
 
 // Attach scanned file count
