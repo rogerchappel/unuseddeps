@@ -77,6 +77,7 @@ or make network calls after the initial project install.
 - 🎯 **Accurate** — static analysis finds all `import` / `require()` / `import()` / `export from` patterns.
 - 🎨 **Colorful output** — pretty text by default, `--format json` for machines.
 - 📦 **Scoped packages** — `@types/foo` maps to `foo` automatically.
+- 🔗 **Local packages** — `workspace:`, `file:`, and `link:` dependencies are ignored by declared package name.
 - 🚫 **Ignore patterns** — `--ignore "eslint*"` for tools that don't get imported.
 - 🔧 **CI-friendly** — exits 0 when clean, exits 1 when unused deps found.
 - 🏗️ **Dev deps** — checks devDependencies by default; `--no-include-dev` to skip.
@@ -164,6 +165,12 @@ When you declare `@types/express` but import `express`, `unuseddeps` knows they'
 ### Peer & optional dependencies
 
 Peer dependencies and optional dependencies are **never** flagged as unused — they're declared for consumers of your library, not for your own imports.
+
+### Local dependencies
+
+Dependencies declared with `workspace:`, `file:`, or `link:` ranges are treated
+as local packages and are not flagged as unused. Only the package carrying the
+local range is ignored; other unused dependencies remain in the report.
 
 ## Programmatic API
 
