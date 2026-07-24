@@ -12,4 +12,15 @@ describe('detectUnused', () => {
       scannedFiles: 1,
     });
   });
+
+  it('ignores local protocol dependencies by package name', () => {
+    const fixture = resolve(__dirname, '..', 'fixtures', 'local-protocols');
+
+    expect(detectUnused(fixture)).toMatchObject({
+      unused: ['lodash', 'vitest'],
+      used: ['local-file', 'local-link', 'local-workspace'],
+      ignored: ['local-file', 'local-link', 'local-workspace'],
+      scannedFiles: 1,
+    });
+  });
 });
