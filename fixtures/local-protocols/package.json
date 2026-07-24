@@ -1,0 +1,13 @@
+{
+  "name": "local-protocols-fixture",
+  "private": true,
+  "dependencies": {
+    "local-workspace": "workspace:*",
+    "local-file": "file:../local-file",
+    "local-link": "link:../local-link",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "vitest": "^2.0.0"
+  }
+}
