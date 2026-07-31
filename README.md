@@ -214,6 +214,8 @@ Choose `unuseddeps` when you want a focused local scan with a small, explicit CL
 ```bash
 npm run check
 npm test
+npm run audit:all
+npm run audit:prod
 npm run build
 npm run smoke
 npm run package:smoke
@@ -225,6 +227,10 @@ the published package allowlist, executable bin, and CLI shebang. The package
 ships compiled `dist` output plus the README, license, security policy, and
 changelog; source fixtures and test coverage reports stay out of the npm
 artifact.
+
+The two audit commands gate both the complete development graph and the
+production install graph. `npm run release:check` includes both, so known npm
+advisories block a release as well as CI.
 
 ## Contributing
 
