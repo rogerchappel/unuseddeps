@@ -1,18 +1,19 @@
 # Dependency Policy
 
-This template starts with Dependabot updates for GitHub Actions only.
+This repository uses Dependabot for GitHub Actions and checks the npm graph in
+CI and release verification.
 
 ## Baseline policy
 
 - Dependabot checks workflow action versions weekly.
 - Dependency pull requests should be small and reviewed like any other change.
 - Avoid major dependency upgrades in the same commit as feature work.
-- Do not add package-manager Dependabot entries until the generated repository has a real
-  package manifest.
+- Keep the lockfile current and require both `npm run audit:all` and
+  `npm run audit:prod` to report zero known vulnerabilities.
 
-## Adding Node/npm updates later
+## Node/npm updates
 
-After a generated repository adds `package.json`, extend `.github/dependabot.yml` with npm:
+If npm Dependabot updates are enabled later, add this entry:
 
 ```yaml
   - package-ecosystem: npm
@@ -24,6 +25,5 @@ After a generated repository adds `package.json`, extend `.github/dependabot.yml
       prefix: chore
 ```
 
-Run the project's smallest relevant verification before merging dependency
-updates. For Node projects, that usually means lint, tests, typecheck, and build
-when those scripts exist.
+Run `npm run release:check` before merging dependency updates. It covers both
+audit scopes, lint, typechecking, tests, the build, and package smoke tests.
