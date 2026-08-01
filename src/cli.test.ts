@@ -1,13 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import { execFileSync } from 'node:child_process';
-import { resolve } from 'node:path';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 
 const CLI = resolve(__dirname, 'cli.ts');
+const TSX = resolve(__dirname, '..', 'node_modules', 'tsx', 'dist', 'cli.mjs');
 
 /** Run the CLI as a sub-process, capturing both stdout and stderr */
 function runCli(args: string[], cwd: string) {
   try {
-    const stdout = execFileSync('npx', ['tsx', CLI, ...args], {
+    const stdout = execFileSync(process.execPath, [TSX, CLI, ...args], {
       cwd,
       encoding: 'utf-8',
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -123,8 +125,12 @@ describe('cli: error cases', () => {
   });
 
   it('exits 1 for nonexistent dir', () => {
-    const result = runCli(['/nonexistent/path'], '/');
+    const missingDir = join(tmpdir(), `unuseddeps-missing-${process.pid}`);
+    const fixture = resolve(__dirname, '..', 'fixtures', 'all-clean');
+    const result = runCli([missingDir], fixture);
+
     expect(result.code).toBe(1);
+    expect(result.stderr).toContain(`Error: cannot read ${join(missingDir, 'package.json')}`);
   });
 });
 
