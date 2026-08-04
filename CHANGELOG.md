@@ -13,11 +13,13 @@ format and uses semantic versioning when versioned releases are published.
 - JSON and text output modes for local use and CI pipelines.
 - Fixture-backed tests covering clean projects, scoped packages, dev-only dependencies, and unused dependency reports.
 - Release-candidate package checks with `npm run package:smoke` and `npm run release:check`.
+- Strict packed-package consumer verification across supported Node.js releases.
 
 ### Changed
 
 - Replaced template changelog content with release notes specific to `unuseddeps`.
 - Clarified README comparison language to avoid unverifiable benchmark and package-size claims.
+- Set Node.js 20 as the minimum runtime and aligned CI with supported Node.js 20, 22, and 24 releases.
 
 ### Fixed
 

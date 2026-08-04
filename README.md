@@ -188,6 +188,9 @@ console.log(report.used);    // ['express', 'lodash']
 
 ## Installation
 
+`unuseddeps` requires Node.js 20 or newer. CI verifies the active Node.js 20,
+22, and 24 LTS release lines.
+
 ```bash
 # Global CLI
 npm install -g unuseddeps
@@ -219,6 +222,7 @@ npm run audit:prod
 npm run build
 npm run smoke
 npm run package:smoke
+npm run package:consumer
 npm run release:check
 ```
 
@@ -227,6 +231,10 @@ the published package allowlist, executable bin, and CLI shebang. The package
 ships compiled `dist` output plus the README, license, security policy, and
 changelog; source fixtures and test coverage reports stay out of the npm
 artifact.
+
+`npm run package:consumer` packs the real release artifact, installs it into a
+clean consumer project with npm's `engine-strict` setting enabled, and runs the
+installed CLI. CI performs this check on every supported Node.js release line.
 
 The two audit commands gate both the complete development graph and the
 production install graph. `npm run release:check` includes both, so known npm
