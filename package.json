@@ -29,7 +29,8 @@
     "audit:all": "npm audit",
     "audit:prod": "npm audit --omit=dev",
     "package:smoke": "npm run build && node scripts/package-smoke.mjs",
-    "release:check": "npm run audit:all && npm run audit:prod && npm run check && npm test && npm run dependencies:check && npm run build && npm run smoke && npm run package:smoke",
+    "package:consumer": "npm run build && node scripts/package-consumer-smoke.mjs",
+    "release:check": "npm run audit:all && npm run audit:prod && npm run check && npm test && npm run dependencies:check && npm run build && npm run smoke && npm run package:smoke && npm run package:consumer",
     "prepublishOnly": "npm run build"
   },
   "repository": {
@@ -54,7 +55,7 @@
   "author": "Roger Chappel",
   "license": "MIT",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "commander": "^12.1.0",
