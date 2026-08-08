@@ -25,6 +25,7 @@ format and uses semantic versioning when versioned releases are published.
 
 - Ignore import-like text inside comments and string or template literals when scanning dependencies.
 - Match `workspace:`, `file:`, and `link:` dependencies by package name so protocol ranges cannot hide unrelated unused dependencies.
+- Refresh the development dependency lockfile to use `nanoid` 3.3.18, clearing the transitive audit advisory while preserving the Node.js 20, 22, and 24 CI matrix.
 
 ## Release Links
 
