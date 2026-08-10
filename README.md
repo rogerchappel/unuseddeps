@@ -7,8 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/unuseddeps"><img src="https://img.shields.io/npm/v/unuseddeps.svg?style=flat" alt="npm version"></a>
-  <a href="https://nodejs.org/"><img src="https://img.shields.io/node/v/unuseddeps.svg?style=flat" alt="Node.js version"></a>
+  <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg?style=flat" alt="Node.js 20 or newer"></a>
   <a href="https://github.com/rogerchappel/unuseddeps/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/rogerchappel/unuseddeps/ci.yml?style=flat" alt="CI status"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License"></a>
 </p>
@@ -45,17 +44,22 @@ Scanned 14 files
 ## Quick start
 
 ```bash
-# Install (recommended: global CLI)
-npm install -g unuseddeps
+# Install and build the current source
+git clone https://github.com/rogerchappel/unuseddeps.git
+cd unuseddeps
+npm ci
+npm run build
 
-# Run in your project directory
-unuseddeps
+# Scan a project (replace the path with your project directory)
+node dist/cli.js /path/to/your-project
 
 # Check in CI (fails on unused dependencies)
-unuseddeps --format json | jq '.unused | length'
+node dist/cli.js /path/to/your-project --format json
 ```
 
-That's it. No config file needed.
+The npm registry package is not published yet, so `npm install unuseddeps` and
+`npx unuseddeps` are not currently available. The source workflow above is the
+supported installation path until publication. No config file is needed.
 
 ## Runnable demo
 
@@ -126,8 +130,17 @@ unuseddeps --ignore "eslint*" --format json --no-color
 **GitHub Actions:**
 
 ```yaml
+- name: Check out unuseddeps
+  uses: actions/checkout@v4
+  with:
+    repository: rogerchappel/unuseddeps
+    path: .unuseddeps
+
+- name: Build unuseddeps
+  run: npm ci --prefix .unuseddeps && npm run --prefix .unuseddeps build
+
 - name: Check unused dependencies
-  run: npx unuseddeps --format json
+  run: node .unuseddeps/dist/cli.js . --format json
 ```
 
 **npm script:**
@@ -135,10 +148,13 @@ unuseddeps --ignore "eslint*" --format json --no-color
 ```json
 {
   "scripts": {
-    "check-deps": "unuseddeps --format json"
+    "check-deps": "node .unuseddeps/dist/cli.js . --format json"
   }
 }
 ```
+
+The script assumes `unuseddeps` has been checked out and built at
+`.unuseddeps`, as in the Actions example.
 
 ## How it works
 
@@ -174,6 +190,9 @@ local range is ignored; other unused dependencies remain in the report.
 
 ## Programmatic API
 
+The package is not yet available from npm. This API example applies to a future
+registry release; for now, use the source-built CLI documented above.
+
 ```ts
 import { detectUnused } from 'unuseddeps';
 
@@ -192,12 +211,18 @@ console.log(report.used);    // ['express', 'lodash']
 22, and 24 LTS release lines.
 
 ```bash
-# Global CLI
-npm install -g unuseddeps
+# Clone, install exact dependencies, and build
+git clone https://github.com/rogerchappel/unuseddeps.git
+cd unuseddeps
+npm ci
+npm run build
 
-# Or as dev dependency
-npm install -D unuseddeps
+# Run against any Node.js project
+node dist/cli.js /path/to/your-project
 ```
+
+The npm registry package is currently unavailable. Registry installation
+commands will be documented here after the first package publication.
 
 ## What about depcheck / knip?
 
