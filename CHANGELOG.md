@@ -7,6 +7,11 @@ format and uses semantic versioning when versioned releases are published.
 
 ## [Unreleased]
 
+### Documentation
+
+- Replaced unavailable npm registry onboarding with a working source checkout,
+  build, and CLI workflow, including a source-based GitHub Actions example.
+
 ### Added
 
 - CLI for scanning JavaScript and TypeScript projects for declared dependencies that are not imported by source files.
