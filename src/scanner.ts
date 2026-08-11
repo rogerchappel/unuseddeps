@@ -5,6 +5,7 @@
  * Handles:
  *   - ES imports: import x from 'pkg', import { x } from 'pkg', import 'pkg'
  *   - CommonJS: require('pkg'), require('pkg/sub')
+ *   - CommonJS resolution: require.resolve('pkg'), require.resolve('pkg/sub')
  *   - Dynamic imports: await import('pkg'), import('pkg')
  *   - Re-exports: export { x } from 'pkg', export * from 'pkg'
  */
@@ -152,6 +153,18 @@ export function scanFileSource(content: string): Set<string> {
       tokens[index + 3]?.value === ")"
     ) {
       addPackage(results, tokens[index + 2]);
+      continue;
+    }
+
+    if (
+      token.value === "require" &&
+      tokens[index - 1]?.value !== "." &&
+      tokens[index + 1]?.value === "." &&
+      tokens[index + 2]?.value === "resolve" &&
+      tokens[index + 3]?.value === "(" &&
+      tokens[index + 5]?.value === ")"
+    ) {
+      addPackage(results, tokens[index + 4]);
       continue;
     }
 
