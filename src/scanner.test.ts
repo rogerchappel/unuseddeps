@@ -12,6 +12,27 @@ describe('scanFileSource', () => {
     expect(result).toEqual(new Set(['lodash']));
   });
 
+  it('detects static require.resolve calls', () => {
+    const result = scanFileSource(`
+      const plain = require.resolve('lodash');
+      const scoped = require.resolve('@testing-library/react');
+      const subpath = require.resolve('date-fns/format');
+    `);
+
+    expect(result).toEqual(new Set(['lodash', '@testing-library/react', 'date-fns']));
+  });
+
+  it('ignores dynamic and unrelated resolve calls', () => {
+    const result = scanFileSource(`
+      require.resolve(packageName);
+      loader.require.resolve('axios');
+      require.other.resolve('chalk');
+      resolver.resolve('moment');
+    `);
+
+    expect(result).toEqual(new Set());
+  });
+
   it('detects dynamic imports', () => {
     const result = scanFileSource(`const mod = await import('axios');`);
     expect(result).toEqual(new Set(['axios']));

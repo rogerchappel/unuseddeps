@@ -44,7 +44,38 @@ try {
     process.exit(1);
   }
 
-  console.log(`packed consumer smoke passed on Node ${process.version} with engine-strict`);
+  const fixture = resolve(workspace, 'fixture');
+  mkdirSync(fixture);
+  writeFileSync(
+    resolve(fixture, 'package.json'),
+    `${JSON.stringify({ dependencies: { '@scope/tool': '1.0.0', axios: '1.0.0', lodash: '1.0.0' } }, null, 2)}\n`,
+  );
+  writeFileSync(
+    resolve(fixture, 'index.cjs'),
+    `const name = 'axios';\nrequire.resolve('lodash/fp');\nrequire.resolve('@scope/tool/runtime');\nrequire.resolve(name);\nresolver.resolve('axios');\n`,
+  );
+
+  const scan = spawnSync(cli, [fixture, '--format', 'json', '--no-color'], {
+    encoding: 'utf8',
+    stdio: 'pipe',
+  });
+  const reportOutput = scan.status === 1 ? scan.stderr : scan.stdout;
+  if (!reportOutput) {
+    console.error(`packed consumer require.resolve scan produced no report (status ${scan.status})`);
+    process.exit(1);
+  }
+  const report = JSON.parse(reportOutput);
+
+  if (
+    scan.status !== 1 ||
+    JSON.stringify(report.used) !== JSON.stringify(['@scope/tool', 'lodash']) ||
+    JSON.stringify(report.unused) !== JSON.stringify(['axios'])
+  ) {
+    console.error(`packed consumer require.resolve scan failed: ${reportOutput}`);
+    process.exit(1);
+  }
+
+  console.log(`packed consumer smoke passed on Node ${process.version} with engine-strict and require.resolve coverage`);
 } finally {
   rmSync(workspace, { recursive: true, force: true });
 }

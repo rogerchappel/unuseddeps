@@ -22,7 +22,7 @@ You're three months into a project. You've tried Express, hapi, Fastify, and Koa
 
 ## The solution
 
-`unuseddeps` scans your source tree for `import` / `require()` / `import()` / `export from` statements, cross-references against `package.json`, and tells you exactly which declared dependencies are never imported.
+`unuseddeps` scans your source tree for `import` / `require()` / `require.resolve()` / `import()` / `export from` statements, cross-references against `package.json`, and tells you exactly which declared dependencies are never imported.
 
 Zero config. No opinionated project structure. Works offline. Exit code non-zero when unused deps found — perfect for CI.
 
@@ -78,7 +78,7 @@ or make network calls after the initial project install.
 ## Features
 
 - ⚡ **Zero config** — just run it. Reads `package.json`, scans your source, done.
-- 🎯 **Accurate** — static analysis finds all `import` / `require()` / `import()` / `export from` patterns.
+- 🎯 **Accurate** — static analysis finds all `import` / `require()` / `require.resolve()` / `import()` / `export from` patterns.
 - 🎨 **Colorful output** — pretty text by default, `--format json` for machines.
 - 📦 **Scoped packages** — `@types/foo` maps to `foo` automatically.
 - 🔗 **Local packages** — `workspace:`, `file:`, and `link:` dependencies are ignored by declared package name.
@@ -170,9 +170,15 @@ Cross-reference    →  Unused: axios, chalk  ✓ Report
 ```
 
 1. **Parse** `package.json` for all dependencies, devDependencies, peerDependencies, and optionalDependencies.
-2. **Scan** every source file for `import`, `require()`, dynamic `import()`, and `export from` statements. Generated and vendor directories (`node_modules`, `dist`, `build`, and `coverage`) are excluded by default.
+2. **Scan** every source file for `import`, `require()`, `require.resolve()`, dynamic `import()`, and `export from` statements. Generated and vendor directories (`node_modules`, `dist`, `build`, and `coverage`) are excluded by default.
 3. **Cross-reference** declared vs. imported packages — with smart handling of `@types/*` mapping.
 4. **Report** unused packages with suggestions. Exit non-zero when unused deps found.
+
+### Recognized module references
+
+Module specifiers must be static string literals. The scanner recognizes ES imports and re-exports, direct `require('package')`, direct `require.resolve('package')`, and dynamic `import('package')`. Package subpaths resolve to their top-level package, including scoped packages such as `require.resolve('@scope/tool/runtime')`.
+
+Computed names such as `require.resolve(packageName)` are not inferred. Calls on other objects or member chains, such as `resolver.resolve('package')` or `loader.require.resolve('package')`, are not treated as module references.
 
 ### Smart aliasing
 

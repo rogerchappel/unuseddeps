@@ -56,3 +56,12 @@ describe('integration: dev-only fixture', () => {
     expect(report.totalDeclared).toBe(0);
   });
 });
+
+describe('integration: require-resolve fixture', () => {
+  it('counts only static require.resolve module references', () => {
+    const report = runFixture('require-resolve', {});
+
+    expect(report.used).toEqual(['@testing-library/react', 'date-fns', 'lodash']);
+    expect(report.unused).toEqual(['axios']);
+  });
+});
