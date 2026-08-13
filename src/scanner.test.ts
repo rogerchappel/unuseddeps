@@ -38,6 +38,11 @@ describe('scanFileSource', () => {
     expect(result).toEqual(new Set(['axios']));
   });
 
+  it('detects static dynamic imports with no-substitution template literals', () => {
+    const result = scanFileSource('const mod = await import(`lodash`);');
+    expect(result).toEqual(new Set(['lodash']));
+  });
+
   it('detects re-exports', () => {
     const result = scanFileSource(`export { foo } from 'bar';\nexport * from 'baz';`);
     expect(result).toEqual(new Set(['bar', 'baz']));
@@ -127,6 +132,15 @@ describe('scanFileSource', () => {
     `;
 
     expect(scanFileSource(source)).toEqual(new Set(['glob']));
+  });
+
+  it('ignores module syntax in regex literals without hiding adjacent imports', () => {
+    const source = `
+      const importPattern = /import fake from ['"]axios['"]/;
+      import chalk from 'chalk';
+    `;
+
+    expect(scanFileSource(source)).toEqual(new Set(['chalk']));
   });
 });
 
