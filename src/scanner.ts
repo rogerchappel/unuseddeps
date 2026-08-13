@@ -41,14 +41,14 @@ function topLevelPackage(specifier: string): string | null {
 }
 
 interface SourceToken {
-  kind: "identifier" | "string" | "punctuation";
+  kind: "identifier" | "number" | "string" | "punctuation";
   value: string;
 }
 
 /**
  * Tokenize only the source elements needed to recognize module references.
- * Comments and template literals are deliberately discarded so text inside
- * them cannot look like executable import syntax.
+ * Comments, regex literals, and interpolated template literals are discarded
+ * so text inside them cannot look like executable import syntax.
  */
 function tokenizeSource(content: string): SourceToken[] {
   const tokens: SourceToken[] = [];
@@ -80,18 +80,51 @@ function tokenizeSource(content: string): SourceToken[] {
       continue;
     }
 
-    if (character === "`") {
+    if (character === "/" && canStartRegexLiteral(tokens)) {
       index += 1;
+      let inCharacterClass = false;
       while (index < content.length) {
         if (content[index] === "\\") {
           index += 2;
-        } else if (content[index] === "`") {
+        } else if (content[index] === "[") {
+          inCharacterClass = true;
           index += 1;
+        } else if (content[index] === "]") {
+          inCharacterClass = false;
+          index += 1;
+        } else if (content[index] === "/" && !inCharacterClass) {
+          index += 1;
+          while (index < content.length && /[A-Za-z]/.test(content[index])) index += 1;
+          break;
+        } else if (content[index] === "\n" || content[index] === "\r") {
           break;
         } else {
           index += 1;
         }
       }
+      continue;
+    }
+
+    if (character === "`") {
+      let value = "";
+      let hasSubstitution = false;
+      index += 1;
+      while (index < content.length) {
+        if (content[index] === "\\") {
+          value += content[index] + (content[index + 1] ?? "");
+          index += 2;
+        } else if (content[index] === "$" && content[index + 1] === "{") {
+          hasSubstitution = true;
+          index += 2;
+        } else if (content[index] === "`") {
+          index += 1;
+          break;
+        } else {
+          value += content[index];
+          index += 1;
+        }
+      }
+      if (!hasSubstitution) tokens.push({ kind: "string", value });
       continue;
     }
 
@@ -123,11 +156,47 @@ function tokenizeSource(content: string): SourceToken[] {
       continue;
     }
 
+    if (/[0-9]/.test(character)) {
+      const start = index;
+      index += 1;
+      while (index < content.length && /[A-Za-z0-9_.]/.test(content[index])) index += 1;
+      tokens.push({ kind: "number", value: content.slice(start, index) });
+      continue;
+    }
+
     tokens.push({ kind: "punctuation", value: character });
     index += 1;
   }
 
   return tokens;
+}
+
+function canStartRegexLiteral(tokens: SourceToken[]): boolean {
+  const previous = tokens.at(-1);
+  if (!previous) return true;
+
+  if (previous.kind === "punctuation") {
+    return ["(", "[", "{", ",", ";", ":", "=", "!", "?", "~", "+", "-", "*", "%", "&", "|", "^", "<", ">"].includes(
+      previous.value,
+    );
+  }
+
+  return [
+    "await",
+    "case",
+    "delete",
+    "do",
+    "else",
+    "in",
+    "instanceof",
+    "new",
+    "of",
+    "return",
+    "throw",
+    "typeof",
+    "void",
+    "yield",
+  ].includes(previous.value);
 }
 
 function addPackage(results: Set<string>, token: SourceToken | undefined): void {
