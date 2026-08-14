@@ -17,14 +17,23 @@
  *   "lodash/fp" → "lodash"
  *   "@babel/core" → "@babel/core"
  *   "./local" → null (relative)
- *   "node:fs" → null (built-in node scheme)
+ *   "node:fs" → "@types/node" (Node.js built-in)
+ *   "fs/promises" → "@types/node" (bare Node.js built-in)
  */
+import { builtinModules } from "node:module";
+
+const NODE_BUILTINS = new Set(builtinModules.map((name) => name.replace(/^node:/, "")));
+
 function topLevelPackage(specifier: string): string | null {
-  // Skip relative / absolute / url / node-builtin imports
+  const bareSpecifier = specifier.replace(/^node:/, "");
+  if (specifier.startsWith("node:") || NODE_BUILTINS.has(bareSpecifier)) {
+    return "@types/node";
+  }
+
+  // Skip relative / absolute / url imports
   if (
     specifier.startsWith(".") ||
     specifier.startsWith("/") ||
-    specifier.startsWith("node:") ||
     specifier.startsWith("http://") ||
     specifier.startsWith("https://")
   ) {
