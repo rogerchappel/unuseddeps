@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 
 const CLI = resolve(__dirname, 'cli.ts');
 const TSX = resolve(__dirname, '..', 'node_modules', 'tsx', 'dist', 'cli.mjs');
@@ -132,6 +133,27 @@ describe('cli: error cases', () => {
     expect(result.code).toBe(1);
     expect(result.stderr).toContain(`Error: cannot read ${join(missingDir, 'package.json')}`);
   });
+
+  it('reports a non-string dependency range without a stack trace', () => {
+    const project = mkdtempSync(join(tmpdir(), 'unuseddeps-malformed-'));
+    try {
+      writeFileSync(join(project, 'package.json'), JSON.stringify({
+        name: 'probe',
+        dependencies: { broken: 42 },
+      }));
+      writeFileSync(join(project, 'index.js'), 'export {};\n');
+
+      const result = runCli(['--no-include-dev', '--no-color'], project);
+
+      expect(result.code).toBe(1);
+      expect(result.stderr).toBe(
+        'Error: Invalid package.json: "dependencies.broken" must be a string range\n',
+      );
+      expect(result.stderr).not.toContain('at ');
+    } finally {
+      rmSync(project, { recursive: true, force: true });
+    }
+  });
 });
 
 describe('cli: help', () => {
@@ -142,6 +164,7 @@ describe('cli: help', () => {
     expect(output).toContain('--ignore');
     expect(output).toContain('--format');
     expect(output).toContain('--include-dev');
+    expect(output).toContain('dependency sections must be objects with string version ranges');
   });
 
   it('shows version', () => {
