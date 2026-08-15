@@ -14,16 +14,56 @@ export interface ParsedManifest {
   optDeps: Record<string, string>;
 }
 
+type DependencySection =
+  | "dependencies"
+  | "devDependencies"
+  | "peerDependencies"
+  | "optionalDependencies";
+
+function parseDependencySection(
+  manifest: Record<string, unknown>,
+  section: DependencySection,
+): Record<string, string> {
+  const value = manifest[section];
+  if (value === undefined) return {};
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(
+      `Invalid package.json: "${section}" must be an object of string ranges`,
+    );
+  }
+
+  const dependencies: Record<string, string> = {};
+  for (const [name, range] of Object.entries(value)) {
+    if (typeof range !== "string") {
+      throw new Error(
+        `Invalid package.json: "${section}.${name}" must be a string range`,
+      );
+    }
+    dependencies[name] = range;
+  }
+  return dependencies;
+}
+
 /**
  * Parse a package.json string into structured dependency maps.
  */
 export function parseManifest(json: string): ParsedManifest {
-  const parsed = JSON.parse(json);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    throw new Error("Invalid package.json: malformed JSON");
+  }
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("Invalid package.json: root must be an object");
+  }
+
+  const manifest = parsed as Record<string, unknown>;
   return {
-    deps: parsed.dependencies ?? {},
-    devDeps: parsed.devDependencies ?? {},
-    peerDeps: parsed.peerDependencies ?? {},
-    optDeps: parsed.optionalDependencies ?? {},
+    deps: parseDependencySection(manifest, "dependencies"),
+    devDeps: parseDependencySection(manifest, "devDependencies"),
+    peerDeps: parseDependencySection(manifest, "peerDependencies"),
+    optDeps: parseDependencySection(manifest, "optionalDependencies"),
   };
 }
 
