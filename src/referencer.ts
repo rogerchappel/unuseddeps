@@ -35,6 +35,7 @@ export function normalizePackageName(name: string): string {
 export function getLocalPackageNames(manifest: ParsedManifest): string[] {
   return Object.entries({ ...manifest.deps, ...manifest.devDeps })
     .filter(([, range]) =>
+      typeof range === "string" &&
       LOCAL_PROTOCOLS.some((protocol) => range.startsWith(protocol)),
     )
     .map(([name]) => name);

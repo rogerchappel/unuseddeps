@@ -194,6 +194,13 @@ Dependencies declared with `workspace:`, `file:`, or `link:` ranges are treated
 as local packages and are not flagged as unused. Only the package carrying the
 local range is ignored; other unused dependencies remain in the report.
 
+### Invalid manifests
+
+Each dependency section in `package.json` must be an object whose values are
+string version ranges. Malformed JSON, non-object dependency sections, and
+non-string ranges exit with code `1` and a concise `Invalid package.json`
+error; the CLI does not print a stack trace.
+
 ## Programmatic API
 
 The package is not yet available from npm. This API example applies to a future

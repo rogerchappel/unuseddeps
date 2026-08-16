@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { findUnused, normalizePackageName } from './referencer.js';
+import { findUnused, getLocalPackageNames, normalizePackageName } from './referencer.js';
+import type { ParsedManifest } from './parser.js';
 
 describe('normalizePackageName', () => {
   it('strips @types/ prefix from scoped packages', () => {
@@ -13,6 +14,19 @@ describe('normalizePackageName', () => {
 
   it('leaves bare @types alone', () => {
     expect(normalizePackageName('@types')).toBe('@types');
+  });
+});
+
+describe('getLocalPackageNames', () => {
+  it('does not call string methods on malformed runtime values', () => {
+    const malformed = {
+      deps: { broken: 42, local: 'file:../local' },
+      devDeps: {},
+      peerDeps: {},
+      optDeps: {},
+    } as unknown as ParsedManifest;
+
+    expect(getLocalPackageNames(malformed)).toEqual(['local']);
   });
 });
 

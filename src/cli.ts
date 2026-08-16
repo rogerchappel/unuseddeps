@@ -48,6 +48,8 @@ program
   ${pc.cyan("unuseddeps --format json       # output JSON")}
   ${pc.cyan("unuseddeps --no-include-dev    # skip devDependency checks")}
   ${pc.cyan("unuseddeps --no-color          # plain text, no ANSI")}
+
+package.json dependency sections must be objects with string version ranges.
 `,
   );
 
@@ -72,7 +74,14 @@ try {
   process.exit(1);
 }
 
-const manifest = parseManifest(pkgContent);
+let manifest;
+try {
+  manifest = parseManifest(pkgContent);
+} catch (err) {
+  const message = err instanceof Error ? err.message : "Invalid package.json";
+  process.stderr.write(pc.red(`Error: ${message}\n`));
+  process.exit(1);
+}
 const allDeclared = getAllDeclared(manifest);
 
 if (allDeclared.size === 0) {

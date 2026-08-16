@@ -27,6 +27,30 @@ describe('parseManifest', () => {
     expect(result.peerDeps).toEqual({ react: '^18.0.0' });
     expect(result.optDeps).toEqual({ fsevents: '^2.3.0' });
   });
+
+  it.each([
+    'dependencies',
+    'devDependencies',
+    'peerDependencies',
+    'optionalDependencies',
+  ])('rejects a malformed %s section', (section) => {
+    expect(() => parseManifest(JSON.stringify({ [section]: [] })))
+      .toThrow(`Invalid package.json: "${section}" must be an object of string ranges`);
+  });
+
+  it.each([
+    'dependencies',
+    'devDependencies',
+    'peerDependencies',
+    'optionalDependencies',
+  ])('rejects a non-string range in %s', (section) => {
+    expect(() => parseManifest(JSON.stringify({ [section]: { broken: 42 } })))
+      .toThrow(`Invalid package.json: "${section}.broken" must be a string range`);
+  });
+
+  it('rejects malformed JSON with a stable error', () => {
+    expect(() => parseManifest('{')).toThrow('Invalid package.json: malformed JSON');
+  });
 });
 
 describe('getNonFlagSet', () => {
