@@ -85,6 +85,19 @@ describe('cli: all-clean fixture', () => {
   });
 });
 
+describe('cli: node builtins fixture', () => {
+  const fixture = resolve(__dirname, '..', 'fixtures', 'node-builtins');
+
+  it('reports unrelated type packages but not @types/node', () => {
+    const result = runCli(['--format', 'json'], fixture);
+    const report = JSON.parse(result.stderr || result.stdout);
+
+    expect(result.code).toBe(1);
+    expect(report.used).toEqual(['@types/node']);
+    expect(report.unused).toEqual(['@types/express']);
+  });
+});
+
 describe('cli: ignored-directories fixture', () => {
   const fixture = resolve(__dirname, '..', 'fixtures', 'ignored-directories');
 

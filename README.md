@@ -178,11 +178,13 @@ Cross-reference    →  Unused: axios, chalk  ✓ Report
 
 Module specifiers must be static string literals. The scanner recognizes ES imports and re-exports, direct `require('package')`, direct `require.resolve('package')`, and dynamic `import('package')`. Package subpaths resolve to their top-level package, including scoped packages such as `require.resolve('@scope/tool/runtime')`.
 
+Node.js built-ins are recognized in both `node:` form (such as `node:fs`) and supported bare form (such as `fs` or `fs/promises`). These references count as usage evidence for `@types/node`.
+
 Computed names such as `require.resolve(packageName)` are not inferred. Calls on other objects or member chains, such as `resolver.resolve('package')` or `loader.require.resolve('package')`, are not treated as module references.
 
 ### Smart aliasing
 
-When you declare `@types/express` but import `express`, `unuseddeps` knows they're linked. No false positives on type packages.
+When you declare `@types/express` but import `express`, `unuseddeps` knows they're linked. Node.js built-in references similarly map to `@types/node`; they do not mark unrelated `@types/*` packages as used.
 
 ### Peer & optional dependencies
 

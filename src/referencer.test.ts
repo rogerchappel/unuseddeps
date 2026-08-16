@@ -62,6 +62,17 @@ describe('findUnused', () => {
     expect(result.used).toContain('express');
   });
 
+  it('uses builtin evidence only for @types/node', () => {
+    const result = findUnused(
+      manifest({
+        devDeps: { '@types/node': '1', '@types/express': '1' },
+      }),
+      new Set(['@types/node']),
+    );
+    expect(result.used).toEqual(['@types/node']);
+    expect(result.unused).toEqual(['@types/express']);
+  });
+
   it('handles --ignore patterns', () => {
     const result = findUnused(
       manifest({ deps: { chalk: '1', 'eslint-plugin-foo': '1' } }),

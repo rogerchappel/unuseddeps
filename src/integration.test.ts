@@ -43,6 +43,14 @@ describe('integration: scoped fixture', () => {
   });
 });
 
+describe('integration: node builtins fixture', () => {
+  it('counts node: and supported bare builtins without masking other type packages', () => {
+    const report = runFixture('node-builtins', {});
+    expect(report.used).toEqual(['@types/node']);
+    expect(report.unused).toEqual(['@types/express']);
+  });
+});
+
 describe('integration: dev-only fixture', () => {
   it('with devDeps included should find none unused', () => {
     const report = runFixture('dev-only', { includeDev: true });

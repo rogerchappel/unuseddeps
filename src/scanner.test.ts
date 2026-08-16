@@ -53,9 +53,22 @@ describe('scanFileSource', () => {
     expect(result).toEqual(new Set());
   });
 
-  it('skips node builtins', () => {
+  it('records node: builtins as @types/node usage evidence', () => {
     const result = scanFileSource(`import fs from 'node:fs';`);
-    expect(result).toEqual(new Set());
+    expect(result).toEqual(new Set(['@types/node']));
+  });
+
+  it('records supported bare builtins and subpaths as @types/node usage evidence', () => {
+    const result = scanFileSource(`
+      const fs = require('fs');
+      import promises from 'fs/promises';
+    `);
+    expect(result).toEqual(new Set(['@types/node']));
+  });
+
+  it('does not treat packages that merely start with builtin names as builtins', () => {
+    const result = scanFileSource(`import extra from 'fs-extra';`);
+    expect(result).toEqual(new Set(['fs-extra']));
   });
 
   it('extracts top-level package from sub-package', () => {
