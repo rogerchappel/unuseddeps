@@ -5,6 +5,4 @@ export const DEFAULT_EXCLUDE_PATTERNS = [
   "**/build/**",
   "**/coverage/**",
   "**/*.d.ts",
-  "**/vite.config.*",
-  "**/vitest.config.*",
 ];
