@@ -147,6 +147,32 @@ describe('scanFileSource', () => {
     expect(scanFileSource(source)).toEqual(new Set(['glob']));
   });
 
+  it('detects module references in executable template substitutions', () => {
+    const source = `
+      const required = \`${'${require("lodash")}'}\`;
+      const imported = \`${'${import("axios")}'}\`;
+    `;
+
+    expect(scanFileSource(source)).toEqual(new Set(['lodash', 'axios']));
+  });
+
+  it('handles nested syntax in executable template substitutions', () => {
+    const source = `
+      const nested = \`${'${condition ? { module: require("chalk") } : `${import("ora")}`}'}\`;
+    `;
+
+    expect(scanFileSource(source)).toEqual(new Set(['chalk', 'ora']));
+  });
+
+  it('keeps computed template module specifiers unrecognized', () => {
+    const source = `
+      const required = require(\`lodash/${'${flavor}'}\`);
+      const imported = import(\`@scope/${'${moduleName}'}\`);
+    `;
+
+    expect(scanFileSource(source)).toEqual(new Set());
+  });
+
   it('ignores module syntax in regex literals without hiding adjacent imports', () => {
     const source = `
       const importPattern = /import fake from ['"]axios['"]/;
