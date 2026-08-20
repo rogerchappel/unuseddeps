@@ -1,0 +1,7 @@
+{
+  "name": "vite-config-fixture",
+  "private": true,
+  "devDependencies": {
+    "vite-plugin-demo": "1.0.0"
+  }
+}
