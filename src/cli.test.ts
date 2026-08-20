@@ -98,6 +98,20 @@ describe('cli: node builtins fixture', () => {
   });
 });
 
+describe('cli: Vite config fixture', () => {
+  const fixture = resolve(__dirname, '..', 'fixtures', 'vite-config');
+
+  it('counts a dependency imported only from vite.config.js', () => {
+    const result = runCli(['--format', 'json'], fixture);
+    const report = JSON.parse(result.stderr || result.stdout);
+
+    expect(result.code).toBe(0);
+    expect(report.used).toEqual(['vite-plugin-demo']);
+    expect(report.unused).toEqual([]);
+    expect(report.scannedFiles).toBe(1);
+  });
+});
+
 describe('cli: ignored-directories fixture', () => {
   const fixture = resolve(__dirname, '..', 'fixtures', 'ignored-directories');
 

@@ -3,6 +3,16 @@ import { resolve } from 'node:path';
 import { detectUnused } from './index.js';
 
 describe('detectUnused', () => {
+  it('counts dependencies imported only by executable Vite config', () => {
+    const fixture = resolve(__dirname, '..', 'fixtures', 'vite-config');
+
+    expect(detectUnused(fixture)).toMatchObject({
+      unused: [],
+      used: ['vite-plugin-demo'],
+      scannedFiles: 1,
+    });
+  });
+
   it('uses the same excluded directory defaults as the CLI', () => {
     const fixture = resolve(__dirname, '..', 'fixtures', 'ignored-directories');
 
