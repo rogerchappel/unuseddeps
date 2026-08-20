@@ -56,127 +56,139 @@ interface SourceToken {
 
 /**
  * Tokenize only the source elements needed to recognize module references.
- * Comments, regex literals, and interpolated template literals are discarded
- * so text inside them cannot look like executable import syntax.
+ * Comments, regex literals, and template literal text are discarded. Template
+ * substitutions are tokenized because they contain executable source.
  */
 function tokenizeSource(content: string): SourceToken[] {
   const tokens: SourceToken[] = [];
   let index = 0;
 
-  while (index < content.length) {
-    const character = content[index];
+  function tokenizeRange(stopAtClosingBrace = false): void {
+    let braceDepth = 0;
 
-    if (/\s/.test(character)) {
-      index += 1;
-      continue;
-    }
+    while (index < content.length) {
+      const character = content[index];
 
-    if (character === "/" && content[index + 1] === "/") {
-      index += 2;
-      while (index < content.length && content[index] !== "\n") index += 1;
-      continue;
-    }
-
-    if (character === "/" && content[index + 1] === "*") {
-      index += 2;
-      while (
-        index < content.length &&
-        !(content[index] === "*" && content[index + 1] === "/")
-      ) {
+      if (/\s/.test(character)) {
         index += 1;
+        continue;
       }
-      index += 2;
-      continue;
-    }
 
-    if (character === "/" && canStartRegexLiteral(tokens)) {
-      index += 1;
-      let inCharacterClass = false;
-      while (index < content.length) {
-        if (content[index] === "\\") {
-          index += 2;
-        } else if (content[index] === "[") {
-          inCharacterClass = true;
-          index += 1;
-        } else if (content[index] === "]") {
-          inCharacterClass = false;
-          index += 1;
-        } else if (content[index] === "/" && !inCharacterClass) {
-          index += 1;
-          while (index < content.length && /[A-Za-z]/.test(content[index])) index += 1;
-          break;
-        } else if (content[index] === "\n" || content[index] === "\r") {
-          break;
-        } else {
+      if (character === "/" && content[index + 1] === "/") {
+        index += 2;
+        while (index < content.length && content[index] !== "\n") index += 1;
+        continue;
+      }
+
+      if (character === "/" && content[index + 1] === "*") {
+        index += 2;
+        while (index < content.length && !(content[index] === "*" && content[index + 1] === "/")) {
           index += 1;
         }
+        index += 2;
+        continue;
       }
-      continue;
-    }
 
-    if (character === "`") {
-      let value = "";
-      let hasSubstitution = false;
-      index += 1;
-      while (index < content.length) {
-        if (content[index] === "\\") {
-          value += content[index] + (content[index + 1] ?? "");
-          index += 2;
-        } else if (content[index] === "$" && content[index + 1] === "{") {
-          hasSubstitution = true;
-          index += 2;
-        } else if (content[index] === "`") {
-          index += 1;
-          break;
-        } else {
-          value += content[index];
-          index += 1;
-        }
-      }
-      if (!hasSubstitution) tokens.push({ kind: "string", value });
-      continue;
-    }
-
-    if (character === "'" || character === '"') {
-      const quote = character;
-      let value = "";
-      index += 1;
-      while (index < content.length && content[index] !== quote) {
-        if (content[index] === "\\" && index + 1 < content.length) {
-          value += content[index] + content[index + 1];
-          index += 2;
-        } else {
-          value += content[index];
-          index += 1;
-        }
-      }
-      if (content[index] === quote) index += 1;
-      tokens.push({ kind: "string", value });
-      continue;
-    }
-
-    if (/[A-Za-z_$]/.test(character)) {
-      const start = index;
-      index += 1;
-      while (index < content.length && /[A-Za-z0-9_$]/.test(content[index])) {
+      if (character === "/" && canStartRegexLiteral(tokens)) {
         index += 1;
+        let inCharacterClass = false;
+        while (index < content.length) {
+          if (content[index] === "\\") {
+            index += 2;
+          } else if (content[index] === "[") {
+            inCharacterClass = true;
+            index += 1;
+          } else if (content[index] === "]") {
+            inCharacterClass = false;
+            index += 1;
+          } else if (content[index] === "/" && !inCharacterClass) {
+            index += 1;
+            while (index < content.length && /[A-Za-z]/.test(content[index])) index += 1;
+            break;
+          } else if (content[index] === "\n" || content[index] === "\r") {
+            break;
+          } else {
+            index += 1;
+          }
+        }
+        continue;
       }
-      tokens.push({ kind: "identifier", value: content.slice(start, index) });
-      continue;
-    }
 
-    if (/[0-9]/.test(character)) {
-      const start = index;
+      if (character === "`") {
+        let value = "";
+        let hasSubstitution = false;
+        index += 1;
+        while (index < content.length) {
+          if (content[index] === "\\") {
+            value += content[index] + (content[index + 1] ?? "");
+            index += 2;
+          } else if (content[index] === "$" && content[index + 1] === "{") {
+            hasSubstitution = true;
+            index += 2;
+            tokens.push({ kind: "punctuation", value: "`" });
+            tokenizeRange(true);
+            tokens.push({ kind: "punctuation", value: "`" });
+          } else if (content[index] === "`") {
+            index += 1;
+            break;
+          } else {
+            value += content[index];
+            index += 1;
+          }
+        }
+        if (!hasSubstitution) tokens.push({ kind: "string", value });
+        continue;
+      }
+
+      if (character === "}" && stopAtClosingBrace && braceDepth === 0) {
+        index += 1;
+        return;
+      }
+
+      if (character === "'" || character === '"') {
+        const quote = character;
+        let value = "";
+        index += 1;
+        while (index < content.length && content[index] !== quote) {
+          if (content[index] === "\\" && index + 1 < content.length) {
+            value += content[index] + content[index + 1];
+            index += 2;
+          } else {
+            value += content[index];
+            index += 1;
+          }
+        }
+        if (content[index] === quote) index += 1;
+        tokens.push({ kind: "string", value });
+        continue;
+      }
+
+      if (/[A-Za-z_$]/.test(character)) {
+        const start = index;
+        index += 1;
+        while (index < content.length && /[A-Za-z0-9_$]/.test(content[index])) {
+          index += 1;
+        }
+        tokens.push({ kind: "identifier", value: content.slice(start, index) });
+        continue;
+      }
+
+      if (/[0-9]/.test(character)) {
+        const start = index;
+        index += 1;
+        while (index < content.length && /[A-Za-z0-9_.]/.test(content[index])) index += 1;
+        tokens.push({ kind: "number", value: content.slice(start, index) });
+        continue;
+      }
+
+      if (stopAtClosingBrace && character === "{") braceDepth += 1;
+      if (stopAtClosingBrace && character === "}") braceDepth -= 1;
+      tokens.push({ kind: "punctuation", value: character });
       index += 1;
-      while (index < content.length && /[A-Za-z0-9_.]/.test(content[index])) index += 1;
-      tokens.push({ kind: "number", value: content.slice(start, index) });
-      continue;
     }
-
-    tokens.push({ kind: "punctuation", value: character });
-    index += 1;
   }
 
+  tokenizeRange();
   return tokens;
 }
 
@@ -185,9 +197,27 @@ function canStartRegexLiteral(tokens: SourceToken[]): boolean {
   if (!previous) return true;
 
   if (previous.kind === "punctuation") {
-    return ["(", "[", "{", ",", ";", ":", "=", "!", "?", "~", "+", "-", "*", "%", "&", "|", "^", "<", ">"].includes(
-      previous.value,
-    );
+    return [
+      "(",
+      "[",
+      "{",
+      ",",
+      ";",
+      ":",
+      "=",
+      "!",
+      "?",
+      "~",
+      "+",
+      "-",
+      "*",
+      "%",
+      "&",
+      "|",
+      "^",
+      "<",
+      ">",
+    ].includes(previous.value);
   }
 
   return [
