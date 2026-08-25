@@ -33,4 +33,14 @@ describe('detectUnused', () => {
       scannedFiles: 1,
     });
   });
+
+  it('scans .mts and .cts files by default', () => {
+    const fixture = resolve(__dirname, '..', 'fixtures', 'typescript-module-extensions');
+
+    expect(detectUnused(fixture)).toMatchObject({
+      unused: [],
+      used: ['commander', 'picocolors'],
+      scannedFiles: 2,
+    });
+  });
 });

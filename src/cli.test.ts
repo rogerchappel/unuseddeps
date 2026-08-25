@@ -112,6 +112,20 @@ describe('cli: Vite config fixture', () => {
   });
 });
 
+describe('cli: TypeScript module extensions fixture', () => {
+  const fixture = resolve(__dirname, '..', 'fixtures', 'typescript-module-extensions');
+
+  it('counts imports from .mts and .cts files', () => {
+    const result = runCli(['--format', 'json'], fixture);
+    const report = JSON.parse(result.stderr || result.stdout);
+
+    expect(result.code).toBe(0);
+    expect(report.used).toEqual(['commander', 'picocolors']);
+    expect(report.unused).toEqual([]);
+    expect(report.scannedFiles).toBe(2);
+  });
+});
+
 describe('cli: ignored-directories fixture', () => {
   const fixture = resolve(__dirname, '..', 'fixtures', 'ignored-directories');
 
