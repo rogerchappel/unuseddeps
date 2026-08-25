@@ -1,6 +1,6 @@
 /**
  * Import scanner — statically extract top-level module names from
- * .ts, .tsx, .js, .jsx, .mjs, .cjs source files.
+ * .ts, .tsx, .js, .jsx, .mjs, .cjs, .mts, .cts source files.
  *
  * Handles:
  *   - ES imports: import x from 'pkg', import { x } from 'pkg', import 'pkg'
@@ -300,7 +300,16 @@ export function scanFileSource(content: string): Set<string> {
   return results;
 }
 
-export const FILE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"]);
+export const FILE_EXTENSIONS = new Set([
+  ".ts",
+  ".tsx",
+  ".js",
+  ".jsx",
+  ".mjs",
+  ".cjs",
+  ".mts",
+  ".cts",
+]);
 
 /**
  * Scan a list of file paths (absolute or relative), read them, and
