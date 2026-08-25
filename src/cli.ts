@@ -50,6 +50,7 @@ program
   ${pc.cyan("unuseddeps --no-color          # plain text, no ANSI")}
 
 package.json dependency sections must be objects with string version ranges.
+Default source extensions: .ts, .tsx, .js, .jsx, .mjs, .cjs, .mts, .cts.
 `,
   );
 

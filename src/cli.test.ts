@@ -206,6 +206,7 @@ describe('cli: help', () => {
     expect(output).toContain('--format');
     expect(output).toContain('--include-dev');
     expect(output).toContain('dependency sections must be objects with string version ranges');
+    expect(output).toContain('.mjs, .cjs, .mts, .cts');
   });
 
   it('shows version', () => {

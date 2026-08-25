@@ -161,7 +161,7 @@ The script assumes `unuseddeps` has been checked out and built at
 ```
 package.json       →  { express, lodash, axios, chalk }
                         ↓
-Source files (.ts/.tsx/.js/.jsx/.mjs/.cjs)
+Source files (.ts/.tsx/.js/.jsx/.mjs/.cjs/.mts/.cts)
                         ↓
 import statements  →  { express, lodash }
                         ↓
