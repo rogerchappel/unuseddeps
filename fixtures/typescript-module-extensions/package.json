@@ -1,0 +1,8 @@
+{
+  "name": "typescript-module-extensions-fixture",
+  "private": true,
+  "dependencies": {
+    "commander": "^12.1.0",
+    "picocolors": "^1.1.0"
+  }
+}

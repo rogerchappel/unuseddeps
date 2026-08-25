@@ -185,7 +185,7 @@ describe('scanFileSource', () => {
 
 describe('FILE_EXTENSIONS', () => {
   it('includes expected extensions', () => {
-    for (const ext of ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs']) {
+    for (const ext of ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.mts', '.cts']) {
       expect(FILE_EXTENSIONS.has(ext)).toBe(true);
     }
   });

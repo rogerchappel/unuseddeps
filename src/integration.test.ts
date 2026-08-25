@@ -73,3 +73,13 @@ describe('integration: require-resolve fixture', () => {
     expect(report.unused).toEqual(['axios']);
   });
 });
+
+describe('integration: TypeScript module extensions fixture', () => {
+  it('scans imports in both .mts and .cts files', () => {
+    const report = runFixture('typescript-module-extensions', {});
+
+    expect(report.used).toEqual(['commander', 'picocolors']);
+    expect(report.unused).toEqual([]);
+    expect(report.scannedFiles).toBe(2);
+  });
+});
