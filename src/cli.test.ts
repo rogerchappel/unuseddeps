@@ -85,6 +85,19 @@ describe('cli: all-clean fixture', () => {
   });
 });
 
+describe('cli: custom scan patterns', () => {
+  it('scans supported static imports in a matched non-default extension', () => {
+    const fixture = resolve(__dirname, '..', 'fixtures', 'custom-extension');
+    const result = runCli(['--no-include-dev', '--scan-pattern', '**/*.vue', '--format', 'json'], fixture);
+
+    expect(result.code).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.used).toContain('left-pad');
+    expect(report.unused).not.toContain('left-pad');
+    expect(report.scannedFiles).toBe(1);
+  });
+});
+
 describe('cli: node builtins fixture', () => {
   const fixture = resolve(__dirname, '..', 'fixtures', 'node-builtins');
 
