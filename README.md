@@ -98,7 +98,7 @@ Options:
   --include-dev                 Include devDependencies (default: true)
   --no-include-dev              Skip devDependencies
   --no-color                    Disable colored output (CI-friendly)
-  --scan-pattern <patterns...>  Additional source file patterns
+  --scan-pattern <patterns...>  Additional file globs; scan static imports in any extension
   -h, --help                    Show help
   -V, --version                 Show version
 ```
@@ -118,8 +118,8 @@ unuseddeps --ignore "typescript" --ignore "prettier"
 # Only check production deps
 unuseddeps --no-include-dev
 
-# Custom source patterns
-unuseddeps --scan-pattern "server/**/*.ts"
+# Custom source patterns (matched files are scanned regardless of extension)
+unuseddeps --scan-pattern "src/**/*.vue"
 
 # Combine flags
 unuseddeps --ignore "eslint*" --format json --no-color

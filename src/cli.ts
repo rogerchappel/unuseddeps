@@ -38,7 +38,7 @@ program
   .option("--include-dev", "Include devDependencies in the check", true)
   .option("--no-include-dev", "Exclude devDependencies from the check")
   .option("--no-color", "Disable colored output")
-  .option("--scan-pattern <patterns...>", "Additional glob patterns for files to scan")
+  .option("--scan-pattern <patterns...>", "Additional file globs (static imports scanned regardless of extension)")
   .addHelpText(
     "after",
     `\n${pc.bold("Examples:")}
