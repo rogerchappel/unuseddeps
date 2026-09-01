@@ -1,6 +1,7 @@
 /**
  * Import scanner — statically extract top-level module names from
- * .ts, .tsx, .js, .jsx, .mjs, .cjs, .mts, .cts source files.
+ * source files selected by the caller. FILE_EXTENSIONS defines the default
+ * discovery set, while explicit custom patterns may select other extensions.
  *
  * Handles:
  *   - ES imports: import x from 'pkg', import { x } from 'pkg', import 'pkg'
@@ -335,8 +336,6 @@ export function scanFiles(files: string[]): ScanResult {
   const origins = new Map<string, Set<string>>();
 
   for (const file of files) {
-    const ext = file.slice(file.lastIndexOf(".")) || "";
-    if (!FILE_EXTENSIONS.has(ext)) continue;
     let content: string;
     try {
       content = readFileSync(file, "utf-8");
