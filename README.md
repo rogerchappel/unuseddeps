@@ -57,6 +57,11 @@ node dist/cli.js /path/to/your-project
 node dist/cli.js /path/to/your-project --format json
 ```
 
+JSON reports are always written to stdout, including when unused dependencies
+produce exit code `1`, so they can be redirected or piped to another tool.
+Human-readable text findings use stderr when the check fails; usage and input
+diagnostics also use stderr.
+
 The npm registry package is not published yet, so `npm install unuseddeps` and
 `npx unuseddeps` are not currently available. The source workflow above is the
 supported installation path until publication. No config file is needed.
