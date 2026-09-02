@@ -43,8 +43,9 @@ describe('cli: unused-three fixture', () => {
 
   it('supports --format json', () => {
     const result = runCli(['--format', 'json'], fixture);
-    const output = result.stderr || result.stdout;
-    const parsed = JSON.parse(output);
+    expect(result.code).toBe(1);
+    expect(result.stderr).toBe('');
+    const parsed = JSON.parse(result.stdout);
     expect(parsed.unused).toContain('axios');
   });
 
@@ -83,6 +84,14 @@ describe('cli: all-clean fixture', () => {
     const result = runCli([], fixture);
     expect(result.stdout).toContain('Scanned');
   });
+
+  it('outputs clean JSON in stdout', () => {
+    const result = runCli(['--format', 'json'], fixture);
+    expect(result.code).toBe(0);
+    expect(result.stderr).toBe('');
+    const report = JSON.parse(result.stdout);
+    expect(report.unused).toEqual([]);
+  });
 });
 
 describe('cli: custom scan patterns', () => {
@@ -103,9 +112,10 @@ describe('cli: node builtins fixture', () => {
 
   it('reports unrelated type packages but not @types/node', () => {
     const result = runCli(['--format', 'json'], fixture);
-    const report = JSON.parse(result.stderr || result.stdout);
+    const report = JSON.parse(result.stdout);
 
     expect(result.code).toBe(1);
+    expect(result.stderr).toBe('');
     expect(report.used).toEqual(['@types/node']);
     expect(report.unused).toEqual(['@types/express']);
   });
@@ -144,9 +154,10 @@ describe('cli: ignored-directories fixture', () => {
 
   it('does not count imports in excluded directory descendants', () => {
     const result = runCli(['--format', 'json'], fixture);
-    const report = JSON.parse(result.stderr || result.stdout);
+    const report = JSON.parse(result.stdout);
 
     expect(result.code).toBe(1);
+    expect(result.stderr).toBe('');
     expect(report.unused).toEqual(['chalk', 'left-pad']);
     expect(report.used).toEqual([]);
     expect(report.scannedFiles).toBe(1);
@@ -158,9 +169,10 @@ describe('cli: local protocol dependencies', () => {
 
   it('ignores local package names without hiding unrelated dependencies', () => {
     const result = runCli(['--format', 'json'], fixture);
-    const report = JSON.parse(result.stderr || result.stdout);
+    const report = JSON.parse(result.stdout);
 
     expect(result.code).toBe(1);
+    expect(result.stderr).toBe('');
     expect(report.unused).toEqual(['lodash', 'vitest']);
     expect(report.ignored).toEqual([
       'local-file',
