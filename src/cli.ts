@@ -138,7 +138,7 @@ const options: ReporterOptions = {
 
 const output = formatReport(report, options);
 
-if (report.unused.length > 0) {
+if (report.unused.length > 0 && opts.format === "text") {
   process.stderr.write(output + "\n");
 } else {
   process.stdout.write(output + "\n");
