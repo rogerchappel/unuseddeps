@@ -59,7 +59,7 @@ try {
     encoding: 'utf8',
     stdio: 'pipe',
   });
-  const reportOutput = scan.status === 1 ? scan.stderr : scan.stdout;
+  const reportOutput = scan.stdout;
   if (!reportOutput) {
     console.error(`packed consumer require.resolve scan produced no report (status ${scan.status})`);
     process.exit(1);
@@ -68,6 +68,7 @@ try {
 
   if (
     scan.status !== 1 ||
+    scan.stderr !== '' ||
     JSON.stringify(report.used) !== JSON.stringify(['@scope/tool', 'lodash']) ||
     JSON.stringify(report.unused) !== JSON.stringify(['axios'])
   ) {
