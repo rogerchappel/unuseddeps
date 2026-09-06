@@ -181,7 +181,7 @@ Cross-reference    →  Unused: axios, chalk  ✓ Report
 
 ### Recognized module references
 
-Module specifiers must be static string literals or template literals without substitutions. The scanner recognizes ES imports and re-exports, direct `require('package')`, direct `require.resolve('package')`, and dynamic `import('package')`, including executable references inside `${...}` template substitutions. Computed template module specifiers such as `` import(`package/${name}`) `` are not recognized. Package subpaths resolve to their top-level package, including scoped packages such as `require.resolve('@scope/tool/runtime')`.
+Module specifiers must be static string literals or template literals without substitutions. The scanner recognizes ES imports and re-exports, direct `require('package')`, direct `require.resolve('package')`, and dynamic `import('package')`, including calls with an options argument such as `require.resolve('package', { paths })` or `import('data-package', { with: { type: 'json' } })`. References inside executable `${...}` template substitutions are also recognized. Computed template module specifiers such as `` import(`package/${name}`) `` are not recognized. Package subpaths resolve to their top-level package, including scoped packages such as `require.resolve('@scope/tool/runtime')`.
 
 Node.js built-ins are recognized in both `node:` form (such as `node:fs`) and supported bare form (such as `fs` or `fs/promises`). These references count as usage evidence for `@types/node`.
 
