@@ -245,6 +245,25 @@ function addPackage(results: Set<string>, token: SourceToken | undefined): void 
   if (top) results.add(top);
 }
 
+function staticCallSpecifier(tokens: SourceToken[], openParenIndex: number): SourceToken | undefined {
+  const specifier = tokens[openParenIndex + 1];
+  if (specifier?.kind !== "string") return undefined;
+
+  const separator = tokens[openParenIndex + 2];
+  if (separator?.value === ")") return specifier;
+  if (separator?.value !== "," || tokens[openParenIndex + 3]?.value === ")") return undefined;
+
+  let depth = 1;
+  for (let index = openParenIndex + 3; index < tokens.length; index += 1) {
+    const value = tokens[index].value;
+    if (value === "(" || value === "[" || value === "{") depth += 1;
+    if (value === ")" || value === "]" || value === "}") depth -= 1;
+    if (depth === 0) return value === ")" ? specifier : undefined;
+  }
+
+  return undefined;
+}
+
 /**
  * Scan a single file string and return unique top-level package names.
  */
@@ -270,17 +289,16 @@ export function scanFileSource(content: string): Set<string> {
       tokens[index - 1]?.value !== "." &&
       tokens[index + 1]?.value === "." &&
       tokens[index + 2]?.value === "resolve" &&
-      tokens[index + 3]?.value === "(" &&
-      tokens[index + 5]?.value === ")"
+      tokens[index + 3]?.value === "("
     ) {
-      addPackage(results, tokens[index + 4]);
+      addPackage(results, staticCallSpecifier(tokens, index + 3));
       continue;
     }
 
     if (token.value !== "import" && token.value !== "export") continue;
 
     if (token.value === "import" && tokens[index + 1]?.value === "(") {
-      if (tokens[index + 3]?.value === ")") addPackage(results, tokens[index + 2]);
+      addPackage(results, staticCallSpecifier(tokens, index + 1));
       continue;
     }
 
