@@ -3,6 +3,7 @@
     "@testing-library/react": "latest",
     "axios": "latest",
     "date-fns": "latest",
-    "lodash": "latest"
+    "lodash": "latest",
+    "picocolors": "latest"
   }
 }
