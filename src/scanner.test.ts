@@ -22,6 +22,15 @@ describe('scanFileSource', () => {
     expect(result).toEqual(new Set(['lodash', '@testing-library/react', 'date-fns']));
   });
 
+  it('detects static require.resolve calls with options', () => {
+    const result = scanFileSource(`
+      require.resolve('lodash', { paths: ['/tmp'] });
+      require.resolve('@testing-library/react', options);
+    `);
+
+    expect(result).toEqual(new Set(['lodash', '@testing-library/react']));
+  });
+
   it('ignores dynamic and unrelated resolve calls', () => {
     const result = scanFileSource(`
       require.resolve(packageName);
@@ -36,6 +45,25 @@ describe('scanFileSource', () => {
   it('detects dynamic imports', () => {
     const result = scanFileSource(`const mod = await import('axios');`);
     expect(result).toEqual(new Set(['axios']));
+  });
+
+  it('detects static dynamic imports with options', () => {
+    const result = scanFileSource(`
+      import('axios', { with: { type: 'json' } });
+      import('lodash', options);
+    `);
+
+    expect(result).toEqual(new Set(['axios', 'lodash']));
+  });
+
+  it('keeps computed option-bearing module references unrecognized', () => {
+    const result = scanFileSource(`
+      import(packageName, { with: { type: 'json' } });
+      require.resolve(packageName, { paths: ['/tmp'] });
+      loader.require.resolve('axios', { paths: ['/tmp'] });
+    `);
+
+    expect(result).toEqual(new Set());
   });
 
   it('detects static dynamic imports with no-substitution template literals', () => {

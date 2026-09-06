@@ -69,7 +69,7 @@ describe('integration: require-resolve fixture', () => {
   it('counts only static require.resolve module references', () => {
     const report = runFixture('require-resolve', {});
 
-    expect(report.used).toEqual(['@testing-library/react', 'date-fns', 'lodash']);
+    expect(report.used).toEqual(['@testing-library/react', 'date-fns', 'lodash', 'picocolors']);
     expect(report.unused).toEqual(['axios']);
   });
 });
