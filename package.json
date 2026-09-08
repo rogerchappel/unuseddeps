@@ -30,7 +30,8 @@
     "audit:prod": "npm audit --omit=dev",
     "package:smoke": "npm run build && node scripts/package-smoke.mjs",
     "package:consumer": "npm run build && node scripts/package-consumer-smoke.mjs",
-    "release:check": "npm run audit:all && npm run audit:prod && npm run check && npm test && npm run dependencies:check && npm run build && npm run smoke && npm run package:smoke && npm run package:consumer",
+    "tasks:status-check": "node scripts/check-task-status.mjs",
+    "release:check": "npm run audit:all && npm run audit:prod && npm run check && npm run tasks:status-check && npm test && npm run dependencies:check && npm run build && npm run smoke && npm run package:smoke && npm run package:consumer",
     "prepublishOnly": "npm run build"
   },
   "repository": {
