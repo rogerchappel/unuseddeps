@@ -1,56 +1,48 @@
-# UnusedDeps - Implementation Tasks
+# UnusedDeps - Task Status
 
-## Phase 0: PRD (done)
-- [x] Write PRD.md
+This document separates shipped behavior from roadmap work. Each completed area
+links to executable evidence so the status can be checked as the project evolves.
 
-## Phase 1: Scaffold & Package
-- [ ] Set up package.json: name=unuseddeps, type=module, main entry point
-- [ ] Configure tsconfig.json for ESM
-- [ ] Add dependencies: tsx (dev), glob, yaml, @types/node, commander, picocolors
-- [ ] Set up eslint config, prettier config
-- [ ] Create src/index.ts (CLI entry), src/scanner.ts, src/parser.ts, src/reporter.ts
-- [ ] Set up vitest config
-- [ ] Create src/cli.ts (commander CLI)
+## Current
 
-## Phase 2: Core Parser
-- [ ] Implement package.json parser to extract all dependencies and devDependencies
-- [ ] Implement TypeScript/JSX import scanner: handle `import`, `require()`, `import()`, `export from`
-- [ ] Handle scoped packages (@types/* should map to the package without @types prefix)
-- [ ] Handle aliased imports via tsconfig paths
-- [ ] Support .ts, .tsx, .js, .jsx, .mjs, .cjs file extensions
+- [x] Package and TypeScript scaffold: [`package.json`](../package.json),
+  [`tsconfig.json`](../tsconfig.json), and [`src/cli.ts`](../src/cli.ts) define the
+  ESM package, build, CLI entry point, and release checks. The package currently
+  declares `commander`, `glob`, and `picocolors`; the obsolete planned `yaml`
+  dependency is no longer part of the manifest.
+- [x] Manifest parsing: [`src/parser.ts`](../src/parser.ts) reads dependencies,
+  devDependencies, peerDependencies, and optionalDependencies, with coverage in
+  [`src/parser.test.ts`](../src/parser.test.ts).
+- [x] Import scanning: [`src/scanner.ts`](../src/scanner.ts) recognizes static
+  imports, `require()`, dynamic imports, re-exports, scoped packages, Node.js
+  built-ins, and the supported TypeScript/JavaScript extensions. See
+  [`src/scanner.test.ts`](../src/scanner.test.ts).
+- [x] Dependency cross-reference: [`src/referencer.ts`](../src/referencer.ts)
+  compares declared and imported packages, preserves peer/optional dependencies,
+  and supports ignore patterns and excluding devDependencies. See
+  [`src/referencer.test.ts`](../src/referencer.test.ts).
+- [x] Text and JSON reporting: [`src/reporter.ts`](../src/reporter.ts) formats
+  colorized terminal output and machine-readable output. Clean scans exit 0,
+  unused-dependency scans exit 1, and usage errors exit 2, as covered by
+  [`src/cli.test.ts`](../src/cli.test.ts).
+- [x] CLI workflow: scan a directory (default `.`), choose `--format`, repeat
+  `--ignore`, use `--no-include-dev`, or disable color. The authoritative options
+  and examples are in [`README.md`](../README.md) and [`src/cli.ts`](../src/cli.ts);
+  obsolete planned flag names are not retained here.
+- [x] Fixtures and verification: [`fixtures/`](../fixtures/) covers clean, unused,
+  dev-only, and scoped-package projects. `npm run release:check` runs audits,
+  type/lint, 97 tests, dependency self-check, build, CLI smoke, and package smokes.
+- [x] Maintainer documentation and metadata: [`README.md`](../README.md),
+  [`CONTRIBUTING.md`](../CONTRIBUTING.md), and [`package.json`](../package.json)
+  describe the implemented package and its repository metadata.
 
-## Phase 3: Cross-Reference Engine
-- [ ] Compare declared deps vs imported packages
-- [ ] Support --ignore patterns for known exemptions
-- [ ] Handle workspace packages and internal aliases
-- [ ] Handle peerDependencies (don't flag as unused)
+## Next
 
-## Phase 4: Reporter
-- [ ] Implement text output mode (default): list unused deps with suggestion
-- [ ] Implement JSON output mode (--format json)
-- [ ] Colorized output with picocolors
-- [ ] Exit code 0 = clean, exit code 1 = unused deps found
-
-## Phase 5: CLI Commands
-- [ ] Main command: scan directory (default .)
-- [ ] Flags: --ignore, --format, --include-dev, --base-dir
-- [ ] Help text and usage examples
-
-## Phase 6: Tests & Fixtures
-- [ ] Create fixtures/ with sample project containing:
-  - project with no unused deps
-  - project with 3 unused deps
-  - project with only devDeps used
-  - project with scoped packages
-- [ ] Write unit tests for parser
-- [ ] Write unit tests for scanner
-- [ ] Write unit tests for cross-reference engine
-- [ ] Write integration test for CLI
-- [ ] Run vitest, ensure >90% coverage
-
-## Phase 7: Docs & Polish
-- [ ] Write README with personality, examples, installation, usage
-- [ ] Write CONTRIBUTING.md
-- [ ] Update package.json description, keywords, repository fields
-- [ ] Run npm test, npm run build, npm run check
-- [ ] Smoke test: run `npx tsx src/cli.ts` on fixtures
+- [ ] Design and implement TypeScript path-alias resolution; the scanner currently
+  treats package-like specifiers literally and does not read `paths` mappings.
+- [ ] Define workspace-package discovery and internal-alias behavior before adding
+  monorepo-specific cross-reference rules.
+- [ ] Decide whether configuration files should be supported. Current behavior is
+  deliberately zero-config and exposes options through the CLI and module API.
+- [ ] Add an explicit coverage threshold only after the threshold and CI policy are
+  agreed; the current release gate runs the full test suite without a numeric floor.
