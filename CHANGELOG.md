@@ -34,6 +34,7 @@ format and uses semantic versioning when versioned releases are published.
 - Match `workspace:`, `file:`, and `link:` dependencies by package name so protocol ranges cannot hide unrelated unused dependencies.
 - Refresh the development dependency lockfile to use `nanoid` 3.3.18, clearing the transitive audit advisory while preserving the Node.js 20, 22, and 24 CI matrix.
 - Bump `vitest` and `@vitest/coverage-v8` to the patched 4.1.11 release, clearing the vitest mocker path-traversal advisory (GHSA-82fw-gwwq-j7x9) while keeping the Node.js 20, 22, and 24 CI matrix.
+- Resolve `@eslint/eslintrc` to 3.3.7 so `js-yaml` installs at the patched 4.3.2 release, clearing the js-yaml CPU-exhaustion advisory (GHSA-2883-xcg3-v3hh).
 
 ## Release Links
 
