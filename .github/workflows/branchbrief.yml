@@ -27,8 +27,6 @@ jobs:
           base_range="origin/$base_ref...HEAD"
           commit_range="origin/$base_ref..HEAD"
 
-          git fetch --no-tags origin "$base_ref:refs/remotes/origin/$base_ref"
-
           changed_files=("")
           changed_file_count=0
           while IFS= read -r file; do
